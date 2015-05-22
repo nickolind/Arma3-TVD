@@ -87,7 +87,7 @@ for "_i" from 0 to 11 do {
 			
 			if (!isNil {_x getVariable "TVD_UnitValue" select 2}) then { 					//Если картодел назначил роль ценному пеху
 				if ( _x getVariable "TVD_UnitValue" select 2 == "sideLeader") then {
-					_x addMPEventHandler ["mpkilled", {if (isServer) then {null = [_this select 0] call TVD_HQTransfer;}}];
+					_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["slTransfer", _this select 0] call TVD_HQTransfer;}}];
 				};
 			} else {												//Если картодел сам не назначил роль - роль по умолчанию ком.отделения.
 				_x getVariable "TVD_UnitValue" pushBack "squadLeader"; 						//Добавляем элемент в массив

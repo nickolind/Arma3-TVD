@@ -30,7 +30,7 @@ _varInt = if (count _this >= 3) then {_this select 2} else {0};
 		case "retreatScore": {
 			_side = _this select 1;
 			_us = [east, west, resistance, civilian, sideLogic] find _side;
-			TVD_MissionLog pushBack parseText format ["<t size='0.7' shadow='2'><t color='#fbbd2c'>%1:</t> Отступив, сторона <t color='%2'>%3</t> компенсировала<br/> <t color='%2'>&#126;%4&#37;</t> потерянного преимущества.</t>",_timeStamp, _sColor select _us, _side, _varInt];
+			TVD_MissionLog pushBack parseText format ["<t size='0.7' shadow='2'><t color='#fbbd2c'>%1:</t> Отступив, сторона <t color='%2'>%3</t> компенсировала<br/><t color='%2'>&#126;%4&#37;</t> потерянного преимущества.</t>",_timeStamp, _sColor select _us, _side, _varInt];
 		};
 		
 		case "killed": {
@@ -49,7 +49,7 @@ _varInt = if (count _this >= 3) then {_this select 2} else {0};
 	};
 
 
-	
+	sleep 3;
 
 	[[] call TVD_WinCalculations] call TVD_Logger;		//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2
 

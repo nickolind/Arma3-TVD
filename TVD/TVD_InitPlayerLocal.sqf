@@ -9,9 +9,14 @@ waitUntil{ sleep 1; !(isNull player) };
 
 if (!isNil {player getVariable "TVD_UnitValue"}) then {
 	_unitValue = player getVariable "TVD_UnitValue";
+	
 	if (!isNil {_unitValue select 2}) then {
+	
+		//Команда на отступление
 		if ( (_unitValue select 2 == "sideLeader") || (_unitValue select 2 == "execSideLeader") ) then {
 			[] spawn {
+				private ["_us","_rand","_ai","_i"];
+				
 				_us = [east,west,resistance] find (side player);
 				waitUntil {sleep 5; TVD_SideCanRetreat select _us};
 				
@@ -51,5 +56,54 @@ if (!isNil {player getVariable "TVD_UnitValue"}) then {
 				}, 1, 0, false, true, "", "retrAction == 2"];
 			};
 		};
+		
+		
+		/*
+		//Команда передачи командования другому
+		if ( (_unitValue select 2 == "execSideLeader") ) then {
+			[] spawn {
+				private ["_rand","_ai","_i"];
+				
+				transAction = 1;
+				
+				player addAction ["КС: Передать командование стороной", {
+					transAction = 2;
+					
+					for "_i" from 0 to 6 do {
+						if (_i == _rand) then {
+							_ai = player addAction ["<t color='#ffffff'>ОТСТУПЛЕНИЕ: Да, я уверен - завершить миссию</t>", {
+								transAction = 0;
+								{player removeAction _x} forEach actIndex;
+								actIndex = nil;
+								TVD_SideRetreat = side player;
+								publicVariableServer "TVD_SideRetreat";
+							}, 1, 0, false, true, "", ""];
+							actIndex pushBack _ai;
+						} else {
+							_ai = player addAction ["<t color='#8BC8D6'>ОТСТУПЛЕНИЕ: Отмена</t>", {
+								transAction = 1;
+								{player removeAction _x} forEach actIndex;
+								actIndex = [];
+							}, 1, 0, false, true, "", ""];
+							actIndex pushBack _ai;
+						};
+					};	
+					
+				}, 1, 0, false, true, "", "transAction == 1"];
+				
+				// player addAction ["<t color='#ffffff'>ПЕРЕДАТЬ: Подтвердить</t>", {
+					
+					// transAction = 3;
+					// _rand = 1 + floor random 5;
+					
+					
+				// }, 1, 0, false, true, "", "transAction == 2"];
+				
+				player addAction ["<t color='#8BC8D6'>ПЕРЕДАТЬ КОМАНДОВАНИЕ: Отмена</t>", {
+					transAction = 1;
+				}, 1, 0, false, true, "", "transAction == 2"];
+			};
+		};
+		*/
 	};
 };

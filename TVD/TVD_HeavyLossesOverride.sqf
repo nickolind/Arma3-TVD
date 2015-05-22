@@ -2,7 +2,7 @@
 Boolean = [] execVM "TVD\TVD_HeavyLossesOverride.sqf";
 
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
-Boolean = [] spawn TVD_HeavyLossesOverride;
+Boolean = [] spawn TVD_HeavyLossesOverride; 
 */
 
 

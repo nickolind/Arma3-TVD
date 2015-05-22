@@ -14,7 +14,7 @@ private ["_missionResults"];
 
 waitUntil {sleep 5; (WMT_pub_frzState >= 3) && (!isNil {WMT_Global_LeftTime})}; //==3 when freeze over, ==1 when freeze up
 
-sleep 30;																	//release-fix -- раскомментить
+sleep 30;
 
 [] spawn {
 	while {!timeToEnd} do {			//Раз в 3мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)	
@@ -31,10 +31,9 @@ while {!timeToEnd} do {
 	
 	//---------------- Потенциал обновлять данные до одного раза в 10-30 сек (пока не нужно):
 	
-	// if ( ((serverTime - _timer) > 5) ) then {			//release-fix -- 30				//Вызов обновления данных по потерям каждые 30 сек.
+	// if ( ((serverTime - _timer) > 30) ) then {				//Вызов обновления данных по потерям каждые 30 сек.
 		// _scoreKeeperVars = _scoreKeeperVars call TVD_ScoreKeeper;
 		// _missionResults = [TVD_InitScore, TVD_sidesInfScore, TVD_sidesValScore, TVD_sidesZonesScore] call TVD_WinCalculations;		//Вычисление победителя
-		// missionResults = _missionResults;				//release-fix -- убрать после дебага
 		// _timer = serverTime;
 	// };
 	

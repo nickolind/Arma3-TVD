@@ -48,7 +48,7 @@ _textOut = composeText [_outcome,
 	parseText "<t underline='true' shadow='2'>Потери личного состава:</t>",				parseText "<t underline='true' shadow='2' align='right'>Осталось в живых:</t><br/>", 
 	parseText format ["<t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
 																						parseText format ["<t align='right'> <t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t></t><br/>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1], 
-	parseText "!", 																		parseText "<t align='right'>!</t><br/>",
+	parseText " ", 																		parseText "<t align='right'> </t><br/>",
 	parseText "<t underline='true' shadow='2'>Лог событий:</t>",						parseText "<t underline='true' shadow='2' align='right'>Контроллируемые зоны:</t>"
 ];
 

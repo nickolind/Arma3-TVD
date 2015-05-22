@@ -59,7 +59,7 @@ _textOut = [_outcome, _missionResults] call TVD_util_DebriefWriter;			//Подг
 	
 	if (_express) then {			//Спешный вывод таблички
 		_timer = serverTime;
-		while {serverTime - _timer < 30} do {				//release-fix -- 30
+		while {serverTime - _timer < 30} do {
 			
 			"MISSION RESULTS" hintC _textOut;
 		
@@ -81,7 +81,7 @@ _textOut = [_outcome, _missionResults] call TVD_util_DebriefWriter;			//Подг
 		titleText ["","BLACK out", 5];
 		sleep 5;
 		_timer = serverTime;
-		while {serverTime - _timer < 30} do {				//release-fix -- 30
+		while {serverTime - _timer < 30} do {
 			
 			"MISSION RESULTS" hintC _textOut;
 		
@@ -95,7 +95,7 @@ _textOut = [_outcome, _missionResults] call TVD_util_DebriefWriter;			//Подг
 			sleep 0.01;
 		};
 
-		["end1",_isPlayerWin,1] call BIS_fnc_endMission;																//release-fix - uncomment
+		["end1",_isPlayerWin,1] call BIS_fnc_endMission;
 	};
 	
 }],"BIS_fnc_call"] call BIS_fnc_MP;
