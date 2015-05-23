@@ -18,8 +18,8 @@ _sidesZonesScore = _statsUpdated select 5;
 
 _scoreRatio = [0,0];
 
-for "_i" from 0 to 1 do{
-	_scoreRatio set [_i, round( ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) ) / (_InitScore select _i) * 1000) / 10];		// 100.0
+for "_i" from 0 to 1 do {
+	if ((_InitScore select _i) != 0) then {_scoreRatio set [_i, round( ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) ) / (_InitScore select _i) * 1000) / 10];};	// 100.0
 	
 	if (_retrOn == _i) then {
 		_sRegain = ((100.0 - (_scoreRatio select _i)) / 2);
