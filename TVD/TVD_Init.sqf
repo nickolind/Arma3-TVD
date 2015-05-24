@@ -16,7 +16,14 @@ this setVariable ["TVD_UnitValue",[independent,100, "role"]];
 
 */
 
+private ["_i","_ownerSide","_unitSide"];
+
+//-------------Mission Settings-------------------
 TVD_sides = [west, independent];
+TVD_RetreatRatio = 0.75;		//Если останется меньше данного процента - у КСа появится возможность отступить
+TVD_RetreatPossible = [true,true,false];			//[east,west,resistance] - If side has possibility to retreat on a mission
+publicVariable "TVD_RetreatPossible";
+//------------------------------------------------
 
 TVD_capZones = [];
 TVD_InitScore = [0,0];
@@ -28,11 +35,9 @@ TVD_sidesZonesScore = [0,0];
 
 timeToEnd = false;
 TVD_HeavyLosses = sideLogic;
-TVD_RetreatRatio = 0.75;
-TVD_SideCanRetreat = [false, false, false];
+TVD_SideCanRetreat = [false, false, false];		//When the retreat conditions are met
 TVD_SideRetreat = sideLogic;
 TVD_MissionLog = [];
-
 
 colorToSide = compileFinal preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
 SideToColor = compileFinal preprocessFileLineNumbers "TVD\TVD_util_SideToColor.sqf";
@@ -62,9 +67,9 @@ publicVariable "TVD_SideCanRetreat";
 waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when freeze up
 
 //--- Настройка: количество зон
-for "_i" from 0 to 11 do {
-	TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide ];
-};
+// for "_i" from 0 to 11 do {
+	// TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide ];
+// };
 
 
 

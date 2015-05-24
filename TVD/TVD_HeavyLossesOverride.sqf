@@ -8,12 +8,6 @@ Boolean = [] spawn TVD_HeavyLossesOverride;
 
 #define PR(x) private ['x']; x
 
-PR(_playerratio) =  [_this, 0, 0.1] call BIS_fnc_param; 
-
-if (isNil "TVD_hl_ratio") then {
-	TVD_hl_ratio = [_playerratio,_playerratio,_playerratio];
-};
-
 if (isNil "TVD_hl_sidelimits") then {
 	TVD_hl_sidelimits = [0,0,0];
 };

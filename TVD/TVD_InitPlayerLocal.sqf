@@ -8,17 +8,22 @@ null = [] spawn TVD_InitPlayerLocal;
 waitUntil{ sleep 1; !(isNull player) };
 
 if (!isNil {player getVariable "TVD_UnitValue"}) then {
+	private ["_us","_unitValue"];
+	
+	_us = [east,west,resistance] find (side player);
 	_unitValue = player getVariable "TVD_UnitValue";
+	
+	waitUntil {sleep 1; !isNil {TVD_RetreatPossible} };
 	
 	if (!isNil {_unitValue select 2}) then {
 	
 		//Команда на отступление
-		if ( (_unitValue select 2 == "sideLeader") || (_unitValue select 2 == "execSideLeader") ) then {
+		if ( ((_unitValue select 2 == "sideLeader") || (_unitValue select 2 == "execSideLeader")) && (TVD_RetreatPossible select _us) ) then {
 			[] spawn {
-				private ["_us","_rand","_ai","_i"];
+				private ["_usC","_rand","_ai","_i"];
 				
-				_us = [east,west,resistance] find (side player);
-				waitUntil {sleep 5; TVD_SideCanRetreat select _us};
+				_usC = [east,west,resistance] find (side player);
+				waitUntil {sleep 5; TVD_SideCanRetreat select _usC};
 				
 				retrAction = 1;
 				actIndex = [];
