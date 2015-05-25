@@ -4,7 +4,7 @@ null = [] execVM "TVD\TVD_WinCalculations.sqf";
 TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
 null = [TVD_InitScore, TVD_sidesInfScore, TVD_sidesValScore, TVD_sidesZonesScore] call TVD_WinCalculations;
 */
-private ["_retrOn","_statsUpdated","_scoreRatio", "_ratioDiff", "_sidesInfScore", "_sidesValScore", "_sidesZonesScore", "_InitScore", "_winSide", "_superiority", "_ratioBalance","_sRegain"];
+private ["_retrOn","_statsUpdated","_scoreRatio", "_ratioDiff", "_sidesInfScore", "_sidesValScore", "_sidesZonesScore", "_sidesResScore", "_InitScore", "_winSide", "_superiority", "_ratioBalance","_sRegain"];
 
 _retrOn = -1;
 if (count _this >= 1) then {_retrOn = _this select 0};			//0 или 1 для массива: TVD_sides = [side0, side1];
@@ -15,11 +15,12 @@ _InitScore = TVD_InitScore;
 _sidesInfScore = _statsUpdated select 3;
 _sidesValScore = _statsUpdated select 4;
 _sidesZonesScore = _statsUpdated select 5;
+_sidesResScore = _statsUpdated select 6;
 
 _scoreRatio = [0,0];
 
 for "_i" from 0 to 1 do {
-	if ((_InitScore select _i) != 0) then {_scoreRatio set [_i, round( ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) ) / (_InitScore select _i) * 1000) / 10];};	// 100.0
+	if ((_InitScore select _i) != 0) then {_scoreRatio set [_i, round( ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) / (_InitScore select _i) * 1000) / 10];};	// 100.0
 	
 	if (_retrOn == _i) then {
 		_sRegain = ((100.0 - (_scoreRatio select _i)) / 2);

@@ -18,8 +18,9 @@ this setVariable ["TVD_UnitValue",[independent,100, "role"]];
 
 private ["_i","_ownerSide","_unitSide"];
 
-//-------------Mission Settings-------------------
+//-------------Параметры, которые можно/нужно настроить в ТВД для правильной работы-------------------
 TVD_sides = [west, independent];
+TVD_capZonesCount = 0;			//Количество присутствующих на миссии зон для захвата.
 TVD_RetreatRatio = 0.75;		//Если останется меньше данного процента - у КСа появится возможность отступить
 TVD_RetreatPossible = [true,true,false];			//[east,west,resistance] - If side has possibility to retreat on a mission
 publicVariable "TVD_RetreatPossible";
@@ -27,11 +28,12 @@ publicVariable "TVD_RetreatPossible";
 
 TVD_capZones = [];
 TVD_InitScore = [0,0];
-TVD_ValUnits = [ [], [] ];
+TVD_ValUnits = [];
 
 TVD_sidesInfScore = [0,0];
 TVD_sidesValScore = [0,0];
 TVD_sidesZonesScore = [0,0];
+TVD_sidesResScore = [0,0];
 
 timeToEnd = false;
 TVD_HeavyLosses = sideLogic;
@@ -52,6 +54,7 @@ TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations
 TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps.sqf";
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
+TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
 
 
 
@@ -67,9 +70,11 @@ publicVariable "TVD_SideCanRetreat";
 waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when freeze up
 
 //--- Настройка: количество зон
-// for "_i" from 0 to 11 do {
-	// TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide ];
-// };
+if (TVD_capZonesCount != 0) then {
+	for "_i" from 0 to (TVD_capZonesCount - 1) do {
+		TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide ];
+	};
+};
 
 
 
@@ -87,7 +92,7 @@ waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when fre
 			_unitSide = TVD_sides find ( _x getVariable "TVD_UnitValue" select 0 );
 			
 			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + (_x getVariable "TVD_UnitValue" select 1)];
-			(TVD_ValUnits select _unitSide) pushBack _x;
+			TVD_ValUnits pushBack _x;
 			_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
 			
 			if (!isNil {_x getVariable "TVD_UnitValue" select 2}) then { 					//Если картодел назначил роль ценному пеху
@@ -112,8 +117,17 @@ waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when fre
 		_unitSide = TVD_sides find ( _x getVariable "TVD_UnitValue" select 0 );
 		
 		TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + (_x getVariable "TVD_UnitValue" select 1)];
-		(TVD_ValUnits select _unitSide) pushBack _x;
+		TVD_ValUnits pushBack _x;
 		
+		_x setVariable ["TVD_CapOwner", _x getVariable "TVD_UnitValue" select 0];		//Выставляем изначальную сторону принадлежности техники (позже понадобится для определения, захвачена ли техника врагом)
+		
+		null = [_x] call TVD_SendToRes;
+		
+		_x addEventHandler ["GetIn",{											//Проверка, юнит чьей стороны сел в машину. Для проверки, захвачена ли техника врагом.
+			if (side (_this select 2) in TVD_sides) then {
+				(_this select 0) setVariable ["TVD_CapOwner", side (_this select 2)];
+			};
+		}];
 		_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
 	};
 } forEach vehicles;

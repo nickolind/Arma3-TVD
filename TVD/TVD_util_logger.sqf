@@ -21,6 +21,7 @@ _missionResults = _this select 0;
 		diag_log	parseText format ["TVD_sidesInfScore = %1", TVD_sidesInfScore];
 		diag_log	parseText format ["TVD_sidesValScore = %1", TVD_sidesValScore];
 		diag_log	parseText format ["TVD_sidesZonesScore = %1", TVD_sidesZonesScore];
+		diag_log	parseText format ["TVD_sidesResScore = %1", TVD_sidesResScore];
 		diag_log	parseText format ["TVD_MissionLog = %1", TVD_MissionLog];
 		diag_log	parseText format ["//------------------------------------------------------------//"];
 

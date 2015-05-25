@@ -1,0 +1,40 @@
+TVD mod
+by Nickorr
+
+-------------------------------------------
+
+План построения / настройки миссии на ТВД:
+
+2. Создать зоны для захвата/удержания, назвать их mZone_ + номер, в поле Text вписать человеческое название зоны (отображается в дебриф-окне)
+
+3. К каждой зоне привязать модуль WMT Point
+
+4. Прописать ценность важным юнитам (10 это обычный боец, 20 - комод, 40 - взводный, 100 - кс и тд)
+	1)Командир стороны - init="this setVariable [""TVD_UnitValue"",[independent,100,""sideLeader""]];";
+
+5. Создать тыловую зону для каждой стороны, куда они смогут отступить.
+
+6. В TVD_init.sqf:
+	- TVD_sides - выставить стороны [Сторона0, Сторона1]
+	- TVD_capZonesCount - указать количество захватываемых зон (0 - если нет зон). Зоны - в виде маркеров с Name - mZone_0 .. mZone_N-1 )
+	- TVD_RetreatPossible - имеет ли сторона возможность отступить. true - может, false - нет. порядок - [east, west, resistance]
+	- строка 74 - выставить цену одной зоны. А так же в ScoreKeeper стр 56.
+	
+7. В init.sqf:
+	wmt_hl_sidelimits = [-1,-1,-1];		//[east, west, resistance]
+	wmt_hl_ratio = [-1,-1,-1];
+	TVD_hl_ratio = [0.1,0.1,0.1];
+	
+8. В initPlayerLocal.sqf:
+	null = [] execVM "TVD\TVD_InitPlayerLocal.sqf";
+	
+9. В initPlayerLocal.sqf:
+	null = [] spawn compileFinal preprocessFileLineNumbers "TVD\TVD_Main.sqf";
+
+10. Тыловая база (куда отступать) должна быть обрамлена триггером. Name триггера должен быть: 
+	для стороны 0 - trgBase_side0
+	для стороны 1 - trgBase_side1
+
+
+
+-------------------------------------------

@@ -23,13 +23,26 @@ _trigger setTriggerActivation ["ANY","PRESENT",true];
 
 
 //Обнуляем ценность преимущества единицы техники, оставшейся вне зоны, для стороны - по факту из величины преимущества эта ценность вычитаеся
-for "_i" from 0 to 1 do {	{
-		if ( !(_x in list _trigger) && ( (_x getVariable "TVD_UnitValue" select 0) == _sideRetreats) ) then {
-			null = ["retreatLoss", _x] call TVD_util_MissionLogWriter;
-			(_x getVariable "TVD_UnitValue") set [1, 0];
-		};
-	} forEach (TVD_ValUnits select _i);
+for "_i" from 0 to (count TVD_ValUnits - 1) do {
+	_un = TVD_ValUnits select _i;
+	if ( !(_un in list _trigger) && ( (_un getVariable "TVD_UnitValue" select 0) == _sideRetreats) ) then {
+		null = ["retreatLoss", _un] call TVD_util_MissionLogWriter;
+		
+		_un setVariable ["TVD_CapOwner", _sideStays];
+		
+		// (_un getVariable "TVD_UnitValue") set [0, _sideStays];
+		// (_un getVariable "TVD_UnitValue") set [1, (_un getVariable "TVD_UnitValue" select 1) / 2];
+	};
+	
 };
+
+// for "_i" from 0 to 1 do {	{
+		// if ( !(_x in list _trigger) && ( (_x getVariable "TVD_UnitValue" select 0) == _sideRetreats) ) then {
+			// null = ["retreatLoss", _x] call TVD_util_MissionLogWriter;
+			// (_x getVariable "TVD_UnitValue") set [1, 0];
+		// };
+	// } forEach (TVD_ValUnits select _i);
+// };
 
 //Отдаем под контроль другой стороне все зоны и очки за них, соответственно, тоже
 {
