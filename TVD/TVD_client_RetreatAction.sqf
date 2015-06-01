@@ -1,8 +1,5 @@
 /*
-null = [] execVM "TVD\TVD_InitPlayerLocal.sqf";
-
-TVD_InitPlayerLocal = compile preprocessFileLineNumbers "TVD\TVD_InitPlayerLocal.sqf";
-null = [] spawn TVD_InitPlayerLocal;
+null = [] execVM "TVD\TVD_client_RetreatAction.sqf";
 */
 
 waitUntil{ sleep 1; !(isNull player) };
@@ -10,7 +7,7 @@ waitUntil{ sleep 1; !(isNull player) };
 if (!isNil {player getVariable "TVD_UnitValue"}) then {
 	private ["_us","_unitValue"];
 	
-	_us = [east,west,resistance] find (side player);
+	_us = [east,west,resistance] find (side group player);
 	_unitValue = player getVariable "TVD_UnitValue";
 	
 	waitUntil {sleep 1; !isNil {TVD_RetreatPossible} };

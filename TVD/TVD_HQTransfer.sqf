@@ -33,7 +33,7 @@ switch (_this select 0) do {
 								
 								//Добавить команду на отступление
 								[[ [], {
-									null = [] execVM "TVD\TVD_InitPlayerLocal.sqf";
+									null = [] execVM "TVD\TVD_client_RetreatAction.sqf";
 								}],"BIS_fnc_call", _x] call BIS_fnc_MP;
 								
 								
@@ -42,7 +42,7 @@ switch (_this select 0) do {
 									if (!isNil {player getVariable "TVD_UnitValue"}) then {
 										["taskAssigned",[0, format ["%1 принял командование стороной", name (_this select 0)]]] call bis_fnc_showNotification;
 									};
-								}],"BIS_fnc_call", side _x] call BIS_fnc_MP;
+								}],"BIS_fnc_call", side group _x] call BIS_fnc_MP;
 								
 								
 								breakTo "depth1";

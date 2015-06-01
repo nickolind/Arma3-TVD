@@ -50,7 +50,7 @@ _varInt = if (count _this >= 3) then {_this select 2} else {0};
 			
 			if (_unit isKindof "Man") then {
 				_unitName = name _unit;
-				TVD_MissionLog pushBack parseText format ["<t size='0.7' shadow='2'><t color='#fbbd2c'>%1:</t> <t color='%2'>%3</t> был убит.</t>",_timeStamp, _sColor select _us, _unitName];
+				TVD_MissionLog pushBack parseText format ["<t size='0.7' shadow='2'><t color='#fbbd2c'>%1:</t> <t color='%2'>%3</t> пропал без вести.</t>",_timeStamp, _sColor select _us, _unitName];
 			} else {
 				_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName");
 				TVD_MissionLog pushBack parseText format ["<t size='0.7' shadow='2'><t color='#fbbd2c'>%1:</t> <t color='%2'>%3</t> был уничтожен.</t>",_timeStamp, _sColor select _us, _unitName];

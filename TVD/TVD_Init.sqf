@@ -1,5 +1,5 @@
 ﻿/*
-null = [] spawn compileFinal preprocessFileLineNumbers "TVD\TVD_Init.sqf";
+null = [sides, capZonesCount, RetreatPossible, ZoneGain, RetreatRatio] call compileFinal preprocessFileLineNumbers "TVD\TVD_Init.sqf";
 
 Вызов из инита юнита:
 this setVariable ["TVD_UnitValue",[WEST,100, "sideLeader"]];
@@ -19,16 +19,18 @@ this setVariable ["TVD_UnitValue",[independent,100, "role"]];
 private ["_i","_ownerSide","_unitSide"];
 
 //-------------Параметры, которые можно/нужно настроить в ТВД для правильной работы-------------------
-TVD_sides = [west, independent];
-TVD_capZonesCount = 0;			//Количество присутствующих на миссии зон для захвата.
-TVD_RetreatRatio = 0.75;		//Если останется меньше данного процента - у КСа появится возможность отступить
-TVD_RetreatPossible = [true,true,false];			//[east,west,resistance] - If side has possibility to retreat on a mission
-publicVariable "TVD_RetreatPossible";
+TVD_sides = _this select 0;
+TVD_capZonesCount = _this select 1;			//Количество присутствующих на миссии зон для захвата.
+TVD_RetreatPossible = _this select 2;			//[east,west,resistance] - If side has possibility to retreat on a mission
+TVD_ZoneGain = _this select 3;			//Количество очков за владение одной зоной (50 по умолчанию)
+TVD_RetreatRatio = _this select 4;		//Если останется меньше данного процента - у КСа появится возможность отступить
 //------------------------------------------------
 
 TVD_capZones = [];
 TVD_InitScore = [0,0];
 TVD_ValUnits = [];
+trgBase_side0 setVariable ["TVD_BaseSide", TVD_sides select 0];
+trgBase_side1 setVariable ["TVD_BaseSide", TVD_sides select 1];
 
 TVD_sidesInfScore = [0,0];
 TVD_sidesValScore = [0,0];
@@ -55,12 +57,15 @@ TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
 TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
+TVD_SendToResMan = compile preprocessFileLineNumbers "TVD\TVD_SendToResMan.sqf";
 
 
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 waitUntil {sleep 3; time > 0};
+publicVariable "TVD_sides";
+publicVariable "TVD_RetreatPossible";
 publicVariable "TVD_SideCanRetreat";
 
 
@@ -81,7 +86,7 @@ if (TVD_capZonesCount != 0) then {
 //-------------Посчет очков за контроллируемые сторонами зоны
 {
 	_ownerSide = TVD_sides find (_x select 1);
-	TVD_InitScore set [_ownerSide, (TVD_InitScore select _ownerSide) + 50];
+	TVD_InitScore set [_ownerSide, (TVD_InitScore select _ownerSide) + TVD_ZoneGain];
 } forEach TVD_capZones;
 
 
@@ -93,20 +98,25 @@ if (TVD_capZonesCount != 0) then {
 			
 			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + (_x getVariable "TVD_UnitValue" select 1)];
 			TVD_ValUnits pushBack _x;
-			_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
-			
+						
 			if (!isNil {_x getVariable "TVD_UnitValue" select 2}) then { 					//Если картодел назначил роль ценному пеху
 				if ( _x getVariable "TVD_UnitValue" select 2 == "sideLeader") then {
-					_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["slTransfer", _this select 0] call TVD_HQTransfer;}}];
+					_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["slTransfer", _this select 0] call TVD_HQTransfer;}}];		
 				};
 			} else {												//Если картодел сам не назначил роль - роль по умолчанию ком.отделения.
 				_x getVariable "TVD_UnitValue" pushBack "squadLeader"; 						//Добавляем элемент в массив
 				_x setVariable ["TVD_UnitValue", _x getVariable "TVD_UnitValue", true];		//Броандкастим обновленное значение
 			};		//Убрать когда напишу util_autoEvaluate
+			
+															//Вызывает логРайтер, который в конце вызовет скорКипер, который удалит TVD_UnitValue убитого юнита
+			_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		// Важно чтобы этот мпэвентхнедлер был вторым, иначе он затрет данные TVD_UnitValue и TVD_HQTransfer не сработает
+																																				
 		} else {
 			_unitSide = TVD_sides find (side _x);
 			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + 10];
 		};
+		
+		_x setVariable ['AGM_isCaptive', false, true];
 	};
 } forEach AllUnits;
 
@@ -121,7 +131,7 @@ if (TVD_capZonesCount != 0) then {
 		
 		_x setVariable ["TVD_CapOwner", _x getVariable "TVD_UnitValue" select 0];		//Выставляем изначальную сторону принадлежности техники (позже понадобится для определения, захвачена ли техника врагом)
 		
-		null = [_x] call TVD_SendToRes;
+		_x setVariable ["TVD_SentToRes", 0, true];
 		
 		_x addEventHandler ["GetIn",{											//Проверка, юнит чьей стороны сел в машину. Для проверки, захвачена ли техника врагом.
 			if (side (_this select 2) in TVD_sides) then {
@@ -131,3 +141,5 @@ if (TVD_capZonesCount != 0) then {
 		_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
 	};
 } forEach vehicles;
+
+publicVariable "TVD_ValUnits";
