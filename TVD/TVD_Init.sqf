@@ -46,18 +46,20 @@ TVD_MissionLog = [];
 colorToSide = compileFinal preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
 SideToColor = compileFinal preprocessFileLineNumbers "TVD\TVD_util_SideToColor.sqf";
 sideToIndex = compileFinal preprocessFileLineNumbers "TVD\TVD_util_sideToIndex.sqf";
+TVD_unitRole = compileFinal preprocessFileLineNumbers "TVD\TVD_util_unitRole.sqf";
 TVD_Logger = compile preprocessFileLineNumbers "TVD\TVD_util_logger.sqf";
 TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_MissionLogWriter.sqf";
 TVD_util_DebriefWriter = compile preprocessFileLineNumbers "TVD\TVD_util_debriefWriter.sqf";
 
-TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
-TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
-TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
+TVD_CaptureVehicle = compile preprocessFileLineNumbers "TVD\TVD_CaptureVehicle.sqf";
 TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps.sqf";
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
+TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
+TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
 TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
 TVD_SendToResMan = compile preprocessFileLineNumbers "TVD\TVD_SendToResMan.sqf";
+TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
 
 
 
@@ -146,9 +148,7 @@ if (TVD_capZonesCount != 0) then {
 		_x setVariable ["TVD_SentToRes", 0, true];
 		
 		_x addEventHandler ["GetIn",{											//Проверка, юнит чьей стороны сел в машину. Для проверки, захвачена ли техника врагом.
-			if (side (_this select 2) in TVD_sides) then {
-				(_this select 0) setVariable ["TVD_CapOwner", side (_this select 2)];
-			};
+			[_this select 0, _this select 2] call TVD_CaptureVehicle;
 		}];
 		_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
 		// _x addMPEventHandler ["mpkilled", {if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 10) ) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)

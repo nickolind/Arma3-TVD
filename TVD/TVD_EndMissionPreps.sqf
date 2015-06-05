@@ -14,7 +14,7 @@ _express = if (count _this >= 3) then {_this select 2} else {false};
 
 
 //	Вывод переменных миссии в лог
-null = [_missionResults] call TVD_Logger;
+null = [_missionResults, _outcome] call TVD_Logger;
 
 
 // 	Вывод итоговой информации клиентам
@@ -43,9 +43,9 @@ _textOut = [_outcome, _missionResults] call TVD_util_DebriefWriter;			//Подг
 	};
 	
 	if (_sup == 0) then {
-		_compText = parseText "<t size='2.7' align='center' shadow='2'>НИЧЬЯ</t><br/>";
+		_compText = parseText "<t size='2.0' align='center' shadow='2'>НИЧЬЯ</t><br/>";
 	} else {
-		_compText = composeText [parseText format ["<t size='2.7' color='%1' align='center' shadow='2'>%2 %3</t><br/><br/>", _tColor, _prefs select (_sup-1), _compText]];
+		_compText = composeText [parseText format ["<t size='2.0' color='%1' align='center' shadow='2'>%2 %3</t><br/>", _tColor, _prefs select (_sup-1), _compText]];
 	};
 
 	_textOut = composeText [_compText, _textOut];

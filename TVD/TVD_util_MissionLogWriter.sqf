@@ -1,20 +1,20 @@
 ﻿/*
 
 TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_MissionLogWriter.sqf";
-null = [_type,_obj, _int] call TVD_util_MissionLogWriter;
+[_type,_obj, _int] call TVD_util_MissionLogWriter;
 "killed"
 "retreat"
 */
 
 
-private ["_unit","_type","_side","_varInt","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel"];
+private ["_unit","_type","_side","_varInt","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel","_unitRole"];
 
 _type = _this select 0;
 _varInt = if (count _this >= 3) then {_this select 2} else {0};
 
 
 _timeStamp = parseText format ["<t size='0.7' shadow='2' color='#CCCCCC'>%1: </t>",[daytime*3600] call BIS_fnc_secondsToString];
-_sColor = ["#e50000","#457aed","#27b413","#d16be5","#ffffff"];
+_sColor = ["#ed4545","#457aed","#27b413","#d16be5","#ffffff"];
 _lCancel = false;
 
 switch (_type) do {
@@ -27,8 +27,20 @@ switch (_type) do {
 			//Живые
 			parseText format ["<t size='0.7' shadow='2'>Живых: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1],
 			//Мертвые
-			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)]
+			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. <br/></t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
+			//Зоны
+			parseText format ["<t size='0.7' shadow='2'>Владение зонами: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, {_x select 1 == TVD_sides select 0} count TVD_capZones,_sColor select _si1, {_x select 1 == TVD_sides select 1} count TVD_capZones]
 		];
+	};
+	
+	case "capVehicle": {
+		_unit = _this select 1;
+		_si0 = [east, west, resistance, civilian, sideLogic] find (_unit getVariable "TVD_UnitValue" select 0 );
+		_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName");
+		_side = TVD_sides select _varInt;		//В данном случае varInt передает индекс стороны из массива TVD_sides
+		_si1 = [east, west, resistance, civilian, sideLogic] find _side;
+		
+		_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> захватили <t color='%3'>%4</t>.</t>", _sColor select _si1, _side, _sColor select _si0, _unitName];
 	};
 	
 	case "sentToRes": {
@@ -59,8 +71,9 @@ switch (_type) do {
 				};
 			};
 			_unitName = name _unit;
-		} else {_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName")};
-		_plot = parseText format ["<t size='0.7' shadow='2'>В ходе отступления <t color='%1'>%2</t> был оставлен врагу.</t>", _sColor select _si0, _unitName];
+			_unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
+		} else {_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName"); _unitRole = ""};
+		_plot = parseText format ["<t size='0.7' shadow='2'>В ходе отступления <t color='%1'>%2(%3)</t> был оставлен врагу.</t>", _sColor select _si0, _unitName, _unitRole];
 	};
 	
 	case "killed": {
@@ -75,7 +88,8 @@ switch (_type) do {
 				};
 			};
 			_unitName = name _unit;
-			_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> пропал без вести.</t>", _sColor select _si0, _unitName];
+			_unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
+			_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2(%3)</t> пропал без вести.</t>", _sColor select _si0, _unitName, _unitRole];
 		} else {
 			_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName");
 			_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> <t color='#FFB23D'>был уничтожен.</t></t>", _sColor select _si0, _unitName];		//fbbd2c

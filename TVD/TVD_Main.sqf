@@ -78,18 +78,14 @@ if (isServer) then {
 	waitUntil {sleep 5; (WMT_pub_frzState >= 3) && (!isNil {WMT_Global_LeftTime})}; //==3 when freeze over, ==1 when freeze up
 
 	sleep 30;
-
 	
-	
-	[] spawn {
+	[] spawn {		//Раз в 10мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)
 		private ["_mTime","_mWaitTime"];
 		
-		while {!timeToEnd} do {			//Раз в 3мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)	
+		while {!timeToEnd} do {				
 			
 			_mTime = diag_tickTime;
 			_mWaitTime = 0.0;
-			
-			//[[] call TVD_WinCalculations] call TVD_Logger;					//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]
 			
 			["scheduled"] call TVD_util_MissionLogWriter;
 			
@@ -98,9 +94,17 @@ if (isServer) then {
 				_mWaitTime = diag_tickTime - _mTime;
 				_mWaitTime > 600
 			};
-		
 		};
 	};
+	
+	// [TVD_capZones] spawn {		//Раз в 10 сек проверка
+		// private ["",""];
+		
+		// while {!timeToEnd} do {				
+			
+			
+		// };
+	// };
 
 	[] spawn TVD_HeavyLossesOverride;
 

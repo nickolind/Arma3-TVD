@@ -13,7 +13,7 @@ _winner = if (_missionResults select 0 == sideLogic) then {"-"} else {str (_miss
 
 _zonesList = [];
 
-_sColor = ["#e50000","#457aed","#27b413","#d16be5","#ffffff"];		//Цвета для сторон - [east, west, resistance, civilian, sideLogic] find _x
+_sColor = ["#ed4545","#457aed","#27b413","#d16be5","#ffffff"];		//Цвета для сторон - [east, west, resistance, civilian, sideLogic] find _x
 _si0 = (TVD_sides select 0) call sideToIndex;
 _si1 = (TVD_sides select 1) call sideToIndex;
 _si = [_si0, _si1];
@@ -23,12 +23,12 @@ _si = [_si0, _si1];
 
 //1. Блок причины завершения:
 switch (_outcome) do {
-	case 0: {_outcome = parseText "<t size='1.1' color='#fbbd2c' align='center' shadow='2'>Миссия завершена администратором</t><br/>"};
-	case 1: {_outcome = parseText "<t size='1.4' color='#fbbd2c' align='center' shadow='2'>Время вышло</t><br/>"};
+	case 0: {_outcome = parseText "<t size='1.0' color='#fbbd2c' align='center' shadow='2'>Миссия завершена администратором</t><br/>"};
+	case 1: {_outcome = parseText "<t size='1.2' color='#fbbd2c' align='center' shadow='2'>Время вышло</t><br/>"};
 	case 2: {	_us = [east, west, resistance, civilian, sideLogic] find TVD_HeavyLosses; 									//Выдаст ошибку, если завершать миссию с параметром TVD_HeavyLosses = sideLogic - нужно указать, какая сторона понесла тяжелые потери
-				_outcome = parseText format ["<t size='1.3' color='#fbbd2c' align='center' shadow='2'>Сторона понесла тяжелые потери:<br/><t color='%1'>%2</t><br/>", _sColor select _us, TVD_sides select (TVD_sides find TVD_HeavyLosses)]};
+				_outcome = parseText format ["<t size='1.1' color='#fbbd2c' align='center' shadow='2'>Сторона понесла тяжелые потери:<br/><t color='%1'>%2</t><br/>", _sColor select _us, TVD_sides select (TVD_sides find TVD_HeavyLosses)]};
 	case 3: {	_us = [east, west, resistance, civilian, sideLogic] find TVD_SideRetreat;									//Выдаст ошибку, если завершать миссию с параметром TVD_SideRetreat = sideLogic - нужно указать, какая сторона отступила
-				_outcome = parseText format ["<t size='1.3' color='#fbbd2c' align='center' shadow='2'>Сторона успешно отступила:<br/><t color='%1'>%2</t><br/>", _sColor select _us, TVD_sides select (TVD_sides find TVD_SideRetreat)]};
+				_outcome = parseText format ["<t size='1.1' color='#fbbd2c' align='center' shadow='2'>Сторона успешно отступила:<br/><t color='%1'>%2</t><br/>", _sColor select _us, TVD_sides select (TVD_sides find TVD_SideRetreat)]};
 };
 
 //Список зон для основного блока под "Контроллируемые зоны":
@@ -40,12 +40,12 @@ zonesList = _zonesList;
 //Основной блок:
 // (разбит на две колонки)
 _textOut = composeText [_outcome,
-	parseText "<t size='1.2' align='center' shadow='2'>---------------------------------------------</t><br/>",
-	parseText "<t size='1.4' align='center' shadow='2'>Итоги миссии:<br/></t>", 
-	parseText "<t underline='true' shadow='2'>Соотношение преимущества сторон:</t><br/>",
+	parseText "<t size='1.0' align='center' shadow='2'>----------------------------------------------------------</t><br/>",
+	parseText "<t size='1.2' align='center' shadow='2'>Итоги миссии:<br/></t>", 
+	parseText "<t size='0.9' underline='true' shadow='2'>Соотношение преимущества сторон:</t><br/>",
 	parseText format ["<t align='center'> <t size='1.8' color='%1'>%2&#37;</t>   &lt;-&gt;   <t size='1.8' color='%3'>%4&#37;</t></t><br/>",_sColor select _si0, _missionResults select 2, _sColor select _si1, _missionResults select 3], 										
-	parseText format ["<t align='center' size='0.8'>(Победила сторона: <t  color='%1'>%2</t>)</t><br/>",_sColor select ([east, west, resistance, civilian, sideLogic] find (_missionResults select 0)), _winner], 										
-	parseText "<t underline='true' shadow='2'>Потери личного состава:</t>",				parseText "<t underline='true' shadow='2' align='right'>Осталось в живых:</t><br/>", 
+	parseText format ["<t align='center' size='0.7'>(Победила сторона: <t  color='%1'>%2</t>)</t><br/>",_sColor select ([east, west, resistance, civilian, sideLogic] find (_missionResults select 0)), _winner], 										
+	parseText "<t size='0.9' underline='true' shadow='2'>Потери личного состава:</t>",				parseText "<t size='0.9' underline='true' shadow='2' align='right'>Осталось в живых:</t><br/>", 
 	parseText format ["<t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
 																						parseText format ["<t align='right'> <t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t></t><br/>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1], 
 	parseText " ", 																		parseText "<t align='right'> </t><br/>",
