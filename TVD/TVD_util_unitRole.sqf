@@ -9,5 +9,6 @@ switch (_this) do
 		case "squadLeader":		{"КО"};
 		case "sniper":			{"Снайпер"};
 		case "vip":				{"VIP"};
+		case "soldier":			{""};
 		default 		{_this}
 	};

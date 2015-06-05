@@ -45,8 +45,6 @@ for [{_i=0},{_i<=(count TVD_ValUnits - 1)},{_i=_i+1}] do {
 	_un = TVD_ValUnits select _i;
 	_us = TVD_sides find (_un getVariable "TVD_UnitValue" select 0);
 	
-	// hint format ["_i = %1\n_un = %2\ncount valUn = %3", _i, TVD_ValUnits select _i, count TVD_ValUnits];
-	// sleep 1;
 	if ( !( alive _un ) || (isNull _un) ) then {
 		if (!isNil {_un getVariable "TVD_UnitValue"}) then {_un setVariable ["TVD_UnitValue", nil, true];};
 		TVD_ValUnits deleteAt _i;

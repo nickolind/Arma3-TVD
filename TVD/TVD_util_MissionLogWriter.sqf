@@ -7,7 +7,7 @@ TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_Miss
 */
 
 
-private ["_unit","_type","_side","_varInt","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel","_unitRole"];
+private ["_unit","_type","_side","_varInt","_varArray","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel","_unitRole"];
 
 _type = _this select 0;
 _varInt = if (count _this >= 3) then {_this select 2} else {0};
@@ -59,21 +59,11 @@ switch (_type) do {
 		_plot = parseText format ["<t size='0.7' shadow='2'>Отступив, сторона <t color='%1'>%2</t> компенсировала<br/><t color='%1'>&#126;%3&#37;</t> потерянного преимущества.</t>", _sColor select _si0, _side, _varInt];
 	};
 	
-	case "retreatLoss": {
-		_unit = _this select 1;
-		_unitSide = TVD_sides find ( _unit getVariable "TVD_UnitValue" select 0 );
-		_si0 = [east, west, resistance, civilian, sideLogic] find (_unit getVariable "TVD_UnitValue" select 0 );
-		
-		if (_unit isKindof "Man") then {
-			if (!isNil{_unit getVariable "TVD_UnitValue" select 2}) then {
-				if (_unit getVariable "TVD_UnitValue" select 2 == "soldier") exitWith {
-					_lCancel = true;
-				};
-			};
-			_unitName = name _unit;
-			_unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
-		} else {_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName"); _unitRole = ""};
-		_plot = parseText format ["<t size='0.7' shadow='2'>В ходе отступления <t color='%1'>%2(%3)</t> был оставлен врагу.</t>", _sColor select _si0, _unitName, _unitRole];
+	case "retreatLossList": {
+		_side = TVD_sides select _varInt;		//В данном случае varInt передает индекс стороны из массива TVD_sides
+		_si0 = [east, west, resistance, civilian, sideLogic] find _side;
+
+		_plot = parseText format ["<t size='0.7' shadow='2'>Потери <t color='%1'>%2</t> при отступлении: <t color='%1'>%3</t></t>", _sColor select _si0, _side, _this select 1];
 	};
 	
 	case "killed": {

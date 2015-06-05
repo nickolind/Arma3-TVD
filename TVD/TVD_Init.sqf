@@ -150,8 +150,8 @@ if (TVD_capZonesCount != 0) then {
 		_x addEventHandler ["GetIn",{											//Проверка, юнит чьей стороны сел в машину. Для проверки, захвачена ли техника врагом.
 			[_this select 0, _this select 2] call TVD_CaptureVehicle;
 		}];
-		_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
-		// _x addMPEventHandler ["mpkilled", {if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 10) ) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
+		// _x addMPEventHandler ["mpkilled", {if (isServer) then {["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
+		_x addMPEventHandler ["mpkilled", {if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 1) ) then {["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
 	};
 } forEach vehicles;
 

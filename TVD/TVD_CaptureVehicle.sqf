@@ -19,7 +19,9 @@ _cUnit = _this select 1;
 
 if ( (side _cUnit in TVD_sides) && (side _cUnit != _cVeh getVariable "TVD_CapOwner") ) then {
 	_cVeh setVariable ["TVD_CapOwner", side _cUnit];
-	["capVehicle",_cVeh, TVD_sides find (_cVeh getVariable "TVD_CapOwner")] call TVD_util_MissionLogWriter;
+	if ((_cVeh getVariable "TVD_UnitValue" select 1 ) > 1) then {
+		["capVehicle",_cVeh, TVD_sides find (_cVeh getVariable "TVD_CapOwner")] call TVD_util_MissionLogWriter;
+	};
 };
 
 
