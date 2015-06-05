@@ -85,8 +85,20 @@ if (TVD_capZonesCount != 0) then {
 
 //-------------Посчет очков за контроллируемые сторонами зоны
 {
-	_ownerSide = TVD_sides find (_x select 1);
-	TVD_InitScore set [_ownerSide, (TVD_InitScore select _ownerSide) + TVD_ZoneGain];
+	if ((_x select 1) in TVD_sides) then {
+		_ownerSide = TVD_sides find (_x select 1);
+		TVD_InitScore set [_ownerSide, (TVD_InitScore select _ownerSide) + TVD_ZoneGain];
+	} else {
+		[_x select 0] spawn {
+			while {true} do {
+				[[ [_this select 0], {	
+					hint format ["ОШИБКА!\nЗОНЕ\n\n%1\n\nНЕ ПРИПИСАНА ИЗНАЧАЛЬНАЯ СТОРОНА-ВЛАДЕЛЕЦ.", _this select 0];	// У зоны всегда должна быть выставленна изначальная сторона-владелец из списка сторон TVD_sides
+				}],"BIS_fnc_call"] call BIS_fnc_MP;
+				sleep (5 + random 5);
+			};
+		};
+			//TVD_InitScore set [0, (TVD_InitScore select 0) + TVD_ZoneGain];		// Если зона на старте миссии никому не принадлежит, то формально она приписывается Стороне0 - на расстановку сил не влияет, однако без такого хака, очки за зоны выпадут из формулы и нарушится баланс (полезут отрицательные соотношения).
+	};
 } forEach TVD_capZones;
 
 
@@ -139,6 +151,7 @@ if (TVD_capZonesCount != 0) then {
 			};
 		}];
 		_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
+		// _x addMPEventHandler ["mpkilled", {if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 10) ) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
 	};
 } forEach vehicles;
 

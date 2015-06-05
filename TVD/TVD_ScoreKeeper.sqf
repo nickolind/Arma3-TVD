@@ -4,7 +4,7 @@ TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
 _scoreKeeperVars = _scoreKeeperVars call TVD_ScoreKeeper;
 
 */
-private ["_valUpdate", "_zoneUpdate", "_counter","_i","_un","_us"];
+private ["_valUpdate", "_zoneUpdate", "_counter","_i","_un","_us","_ownerSide","_curZone"];
 
 _counter = _this select 0;
 _infUpdate = _this select 1;
@@ -41,15 +41,20 @@ TVD_sidesInfScore = [0,0];
 //Подсчет ценных юнитов (техника, командиры, ... )
 TVD_sidesValScore = [0,0];
 
-for "_i" from 0 to (count TVD_ValUnits - 1) do {
+for [{_i=0},{_i<=(count TVD_ValUnits - 1)},{_i=_i+1}] do {
 	_un = TVD_ValUnits select _i;
 	_us = TVD_sides find (_un getVariable "TVD_UnitValue" select 0);
+	
+	// hint format ["_i = %1\n_un = %2\ncount valUn = %3", _i, TVD_ValUnits select _i, count TVD_ValUnits];
+	// sleep 1;
 	if ( !( alive _un ) || (isNull _un) ) then {
 		if (!isNil {_un getVariable "TVD_UnitValue"}) then {_un setVariable ["TVD_UnitValue", nil, true];};
 		TVD_ValUnits deleteAt _i;
 		publicVariable "TVD_ValUnits";
 		_i = _i - 1;
+		
 	} else {
+		
 		if (!isNil {_un getVariable "TVD_CapOwner"}) then {		//Если юнит - техника, то у него будет параметр CapOwner
 			
 			if  ((_un getVariable "TVD_CapOwner") != (_un getVariable "TVD_UnitValue" select 0)) then {		//Если текущая сторона-владелец отличается от изначальной - то захватившей стороне перепадает 50% ценности техники (изначальной стороне, соответственно -100%)
@@ -73,8 +78,9 @@ for "_i" from 0 to (count TVD_ValUnits - 1) do {
 				};
 			}; 
 			
-			TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + (_un getVariable ["TVD_UnitValue", 0] select 1)];
-		
+			if (isPlayer _un) then {	//не считать, если юнит - бот
+				TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + (_un getVariable ["TVD_UnitValue", 0] select 1)];
+			};
 		};
 	};
 	
@@ -82,20 +88,15 @@ for "_i" from 0 to (count TVD_ValUnits - 1) do {
 
 
 
-//Проверка, изменилась ли принадженость зон -> Подсчет очков за захваченные зоны (в данной миссии - 50 за одну (TVD_ZoneGain))
-_zoneUpdate = false;
+//Подсчет очков за захваченные зоны (обычно - 50 за одну (TVD_ZoneGain))
+TVD_sidesZonesScore = [0,0];
 {
-	_curZone = (TVD_capZones select _forEachIndex);
-	if ( ( _curZone select 1) != ( (getMarkerColor (_curZone select 0) ) call colorToSide ) ) exitWith {_zoneUpdate = true}; 
-} forEach TVD_capZones;
-if ( (_zoneUpdate) || (_counter >= 10) ) then {
-	TVD_sidesZonesScore = [0,0];
-	{
-		(TVD_capZones select _forEachIndex) set [1, (getMarkerColor ((TVD_capZones select _forEachIndex) select 0)) call colorToSide];
+	_x set [1, (getMarkerColor (_x select 0)) call colorToSide];
+	if ((_x select 1) in TVD_sides) then {
 		_ownerSide = TVD_sides find (_x select 1);
 		TVD_sidesZonesScore set [_ownerSide, (TVD_sidesZonesScore select _ownerSide) + TVD_ZoneGain];
-	} forEach TVD_capZones;
-};
+	};
+} forEach TVD_capZones;
 
 
 // if (_counter >= 10) then {_counter = 0};

@@ -21,14 +21,16 @@ _trigger setTriggerActivation ["ANY","PRESENT",true];
 	};
 } forEach playableUnits;
 
+null = [] call TVD_WinCalculations; 		//Пересчитать TVD_ValUnits, иначе в цикле ниже может быть выход за пределы массива изза юнитов "soldier"
 
 //Вся техника не в зоне эвакуации становится захваченной врагом
 for "_i" from 0 to (count TVD_ValUnits - 1) do {
 	_un = TVD_ValUnits select _i;
 	if ( !(_un in list _trigger) && ( (_un getVariable "TVD_UnitValue" select 0) == _sideRetreats) ) then {
-		null = ["retreatLoss", _un] call TVD_util_MissionLogWriter;
 		
 		_un setVariable ["TVD_CapOwner", _sideStays];
+		
+		null = ["retreatLoss", _un] call TVD_util_MissionLogWriter;
 	};
 	
 };

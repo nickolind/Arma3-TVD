@@ -35,6 +35,8 @@ null = [ [west, independent] ] spawn compileFinal preprocessFileLineNumbers "TVD
 wmt_hl_sidelimits = [-1,-1,-1];		//[east, west, resistance]
 wmt_hl_ratio = [-1,-1,-1];
 
+if (!isnil{"TVD_Ext\TVD_fnc_init.sqf"}) then {[] call compileFinal preprocessFileLineNumbers "TVD_Ext\TVD_fnc_init.sqf"};
+
 
 //-------------CLIENT PART
 if !(isDedicated) then {
@@ -77,11 +79,25 @@ if (isServer) then {
 
 	sleep 30;
 
+	
+	
 	[] spawn {
+		private ["_mTime","_mWaitTime"];
+		
 		while {!timeToEnd} do {			//Раз в 3мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)	
 			
-			[[] call TVD_WinCalculations] call TVD_Logger;					//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]
-			sleep 180;
+			_mTime = diag_tickTime;
+			_mWaitTime = 0.0;
+			
+			//[[] call TVD_WinCalculations] call TVD_Logger;					//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]
+			
+			["scheduled"] call TVD_util_MissionLogWriter;
+			
+			waitUntil {
+				sleep 2; 
+				_mWaitTime = diag_tickTime - _mTime;
+				_mWaitTime > 600
+			};
 		
 		};
 	};
