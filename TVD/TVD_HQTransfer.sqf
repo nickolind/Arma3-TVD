@@ -40,7 +40,7 @@ switch (_this select 0) do {
 								//Уведомить других о смене КСа
 								[[ [_x], {
 									if (!isNil {player getVariable "TVD_UnitValue"}) then {
-										["taskAssigned",[0, format ["%1 принял командование стороной", name (_this select 0)]]] call bis_fnc_showNotification;
+										["taskAssigned",[0, format ["КС убит. %1 принял командование", name (_this select 0)]]] call bis_fnc_showNotification;
 									};
 								}],"BIS_fnc_call", side group _x] call BIS_fnc_MP;
 								
