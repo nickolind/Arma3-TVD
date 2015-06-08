@@ -35,8 +35,6 @@ null = [ [west, independent] ] spawn compileFinal preprocessFileLineNumbers "TVD
 wmt_hl_sidelimits = [-1,-1,-1];		//[east, west, resistance]
 wmt_hl_ratio = [-1,-1,-1];
 
-if (!isnil{"TVD_Ext\TVD_fnc_init.sqf"}) then {[] call compileFinal preprocessFileLineNumbers "TVD_Ext\TVD_fnc_init.sqf"};
-
 
 //-------------CLIENT PART
 if !(isDedicated) then {

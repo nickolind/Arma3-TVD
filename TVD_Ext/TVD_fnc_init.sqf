@@ -1,5 +1,5 @@
 ﻿/*
-null = [] call compileFinal preprocessFileLineNumbers "TVD_Ext\TVD_fnc_init.sqf";
+[] call compileFinal preprocessFileLineNumbers "TVD_Ext\TVD_fnc_init.sqf"
 */
 
 if !(isDedicated) then {
