@@ -36,6 +36,3 @@ if (isPlayer _cu_target) then {
 	[[ [], { 	["<t color='#e50000'>Вас отправили в тыловой лагерь военно-пленных.</t>", 0, 0.7, 6, 0.2] spawn bis_fnc_dynamictext; 	 }],"BIS_fnc_call", _cu_target] call BIS_fnc_MP; 
 };
 _cu_target setDamage 1;
-		
-		
-// [[] call TVD_WinCalculations] call TVD_Logger;//Вызов логгера

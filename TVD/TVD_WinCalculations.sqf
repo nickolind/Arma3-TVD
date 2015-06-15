@@ -2,15 +2,17 @@
 null = [] execVM "TVD\TVD_WinCalculations.sqf";
 
 TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
-null = [TVD_InitScore, TVD_sidesInfScore, TVD_sidesValScore, TVD_sidesZonesScore] call TVD_WinCalculations;
+null = [] call TVD_WinCalculations;
 */
-private ["_retrOn","_statsUpdated","_scoreRatio", "_ratioDiff", "_sidesInfScore", "_sidesValScore", "_sidesZonesScore", "_sidesResScore", "_InitScore", "_winSide", "_superiority", "_ratioBalance","_sRegain"];
+private ["_retrOn","_endOpt","_statsUpdated","_scoreRatio", "_ratioDiff", "_sidesInfScore", "_sidesValScore", "_sidesZonesScore", "_sidesResScore", "_InitScore", "_winSide", "_superiority", "_ratioBalance","_sRegain"];
 
 _retrOn = -1;
-if (count _this >= 1) then {_retrOn = _this select 0};			//0 или 1 для массива: TVD_sides = [side0, side1];
+_endOpt = -1;
+if (count _this >= 1) then {_endOpt = _this select 0};
+if (count _this >= 2) then {_retrOn = _this select 1};			//0 или 1 для массива: TVD_sides = [side0, side1];
 _sRegain = 0.0;
 
-_statsUpdated = [10,0,0] call TVD_ScoreKeeper;
+_statsUpdated = [_endOpt,0,0] call TVD_ScoreKeeper;
 
 _InitScore = TVD_InitScore;
 _sidesInfScore = _statsUpdated select 3;

@@ -12,7 +12,7 @@ this setVariable ["TVD_markBox", [west,"Ящик с Javelin + 2 ракеты"]];
 				private ["_markerstr"];
 				
 				_markerstr = createMarkerLocal [str (_this select 0), position (_this select 0)];
-				_markerstr  setMarkerColorLocal "ColorYellow";
+				_markerstr  setMarkerColorLocal "ColorOrange";
 				_markerstr  setMarkerTextLocal (_this select 1);
 				_markerstr  setMarkerTypeLocal "mil_dot";
 				

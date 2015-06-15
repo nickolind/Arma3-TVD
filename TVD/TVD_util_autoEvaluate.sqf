@@ -6,8 +6,8 @@ D зависимости от типа юнита автоматом присваивает стандартный вес в очках (если 
 
 
 
-null = [] execVM "TVD\TVD_HQTransfer.sqf";
+null = [] execVM "TVD\TVD_util_autoEvaluate.sqf";
 
-TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
-null = [] call TVD_HQTransfer;
+TVD_util_autoEvaluate = compile preprocessFileLineNumbers "TVD\TVD_util_autoEvaluate.sqf";
+null = [] call TVD_util_autoEvaluate;
 */

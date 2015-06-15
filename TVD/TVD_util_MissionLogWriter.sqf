@@ -7,7 +7,7 @@ TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_Miss
 */
 
 
-private ["_unit","_type","_side","_varInt","_varArray","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel","_unitRole"];
+private ["_unit","_type","_side","_varInt","_varUni","_timeStamp","_unitSide","_sColor","_si0","_si1","_plot","_unitName","_sidesRatio","_missionResults","_lCancel","_unitRole"];
 
 _type = _this select 0;
 _varInt = if (count _this >= 3) then {_this select 2} else {0};
@@ -16,6 +16,7 @@ _varInt = if (count _this >= 3) then {_this select 2} else {0};
 _timeStamp = parseText format ["<t size='0.7' shadow='2' color='#CCCCCC'>%1: </t>",[daytime*3600] call BIS_fnc_secondsToString];
 _sColor = ["#ed4545","#457aed","#27b413","#d16be5","#ffffff"];
 _lCancel = false;
+_missionResults = [];
 
 switch (_type) do {
 	
@@ -23,14 +24,26 @@ switch (_type) do {
 		_si0 = [east, west, resistance, civilian, sideLogic] find (TVD_sides select 0);
 		_si1 = [east, west, resistance, civilian, sideLogic] find (TVD_sides select 1);
 		
-		_plot = composeText [parseText "<t size='0.7' shadow='2'>Статус миссии. </t>",
+		_plot = composeText [
+		
+			// parseText "<t size='0.7' shadow='2'>Статус. </t>",
 			//Живые
 			parseText format ["<t size='0.7' shadow='2'>Живых: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1],
 			//Мертвые
-			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. <br/></t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
+			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
 			//Зоны
-			parseText format ["<t size='0.7' shadow='2'>Владение зонами: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, {_x select 1 == TVD_sides select 0} count TVD_capZones,_sColor select _si1, {_x select 1 == TVD_sides select 1} count TVD_capZones]
+			parseText format ["<t size='0.7' shadow='2'>Зоны: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, {_x select 1 == TVD_sides select 0} count TVD_capZones,_sColor select _si1, {_x select 1 == TVD_sides select 1} count TVD_capZones],
+			//Задачи
+			parseText format ["<t size='0.7' shadow='2'>Задачи: <t color='%1'>%2</t>-<t color='%3'>%4</t>.</t>",_sColor select _si0, TVD_TaskObjectsList select 0,_sColor select _si1, TVD_TaskObjectsList select 1]
 		];
+	};
+	
+	case "taskCompleted": {
+		_varUni = _this select 1;		//Это текст с описанием выполненной задачи
+		_side = TVD_sides select _varInt;		//В данном случае varInt передает индекс стороны из массива TVD_sides
+		_si1 = [east, west, resistance, civilian, sideLogic] find _side;
+		
+		_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> выполнили задачу: <t color='%1'>%3</t>.</t>", _sColor select _si1, _side, _varUni];
 	};
 	
 	case "capVehicle": {
@@ -66,17 +79,27 @@ switch (_type) do {
 		_plot = parseText format ["<t size='0.7' shadow='2'>Потери <t color='%1'>%2</t> при отступлении: <t color='%1'>%3</t></t>", _sColor select _si0, _side, _this select 1];
 	};
 	
+	// case "heavyLossesList": {
+		// _side = TVD_sides select _varInt;		//В данном случае varInt передает индекс стороны из массива TVD_sides
+		// _si0 = [east, west, resistance, civilian, sideLogic] find _side;
+		// _si1 = [east, west, resistance, civilian, sideLogic] find (TVD_sides select (1 -_varInt));
+
+		// _plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> разбили противника. Трофеи и пленники: <t color='%3'>%4</t></t>", _sColor select _si0, _side, _sColor select _si1, _this select 1];
+	// };
+	
 	case "killed": {
 		_unit = _this select 1;
+		
+		if (!isNil{_unit getVariable "TVD_UnitValue" select 2}) then {
+			if (_unit getVariable "TVD_UnitValue" select 2 in ["soldier","squadLeader"]) exitWith {
+				_lCancel = true;
+			};
+		};
+		
 		_unitSide = TVD_sides find ( _unit getVariable "TVD_UnitValue" select 0 );
 		_si0 = [east, west, resistance, civilian, sideLogic] find (_unit getVariable "TVD_UnitValue" select 0 );
 		
 		if (_unit isKindof "Man") then {
-			if (!isNil{_unit getVariable "TVD_UnitValue" select 2}) then {
-				if (_unit getVariable "TVD_UnitValue" select 2 == "soldier") exitWith {
-					_lCancel = true;
-				};
-			};
 			_unitName = name _unit;
 			_unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
 			_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2(%3)</t> пропал без вести.</t>", _sColor select _si0, _unitName, _unitRole];

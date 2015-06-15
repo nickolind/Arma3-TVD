@@ -4,7 +4,7 @@ null = [] execVM "TVD\TVD_SendToRes.sqf";
 TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
 null = [] call TVD_SendToRes;
 */
-private ["_time","_waitTime","_us","_originalUs","_str_target","_str_caller","_unitName","_amount"];
+private ["_time","_waitTime","_us","_originalUs","_str_target","_str_caller","_unitName","_amount","_trig"];
 
 
 _str_target = _this select 0;						// (_this select 0) - _target
@@ -15,7 +15,8 @@ _str_target setVariable ["TVD_SentToRes", 1, true];
 _unitName = getText (configFile >> "CfgVehicles" >> (typeof _str_target) >> "displayName");
 _amount = 0;
 
-"SmokeShellRed" createVehicle position _str_target;
+// "SmokeShellRed" createVehicle position _str_target;
+_trig = false;
 
 //Сообщение что отправка в тыл началась
 {
@@ -45,6 +46,8 @@ while {true} do {
 			};
 		} forEach (_str_target nearEntities 50);
 	};
+	
+	if ((_waitTime > 150) && !(_trig)) then {	"SmokeShellRed" createVehicle position _str_target; _trig = true };
 	
 	if (_waitTime > 180) exitWith {	
 		

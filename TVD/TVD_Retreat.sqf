@@ -4,7 +4,7 @@ null = [] execVM "TVD\TVD_Retreat.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
 null = [] call TVD_Retreat;
 */
-private ["_sideRetreats","_sideStays","_trigger","_stats","_retLossLog"];
+private ["_sideRetreats","_sideStays","_trigger","_stats","_retLossLog","_un"];
 
 _sideRetreats = _this select 0;
 _sideStays = sideLogic;
@@ -57,8 +57,10 @@ null = [_stats] call TVD_Logger;
 //Потери стороны при отступлении:
 ["retreatLossList",_retLossLog,TVD_sides find _sideRetreats] call TVD_util_MissionLogWriter;
 
-//Теперь компенсируем потери отступившей стороны и пишем в лог об этом
-_stats = [TVD_sides find _sideRetreats] call TVD_WinCalculations;		//Отступает сторона 0 или сторон 1 из TVD_sides
+// Теперь компенсируем потери отступившей стороны и пишем в лог об этом
+// _stats = [3,TVD_sides find _sideRetreats] call TVD_WinCalculations;		//Отступает сторона 0 или сторон 1 из TVD_sides
 
 
-_stats
+// _stats
+
+true 

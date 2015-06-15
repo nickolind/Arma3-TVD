@@ -4,14 +4,11 @@ TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
 _scoreKeeperVars = _scoreKeeperVars call TVD_ScoreKeeper;
 
 */
-private ["_valUpdate", "_zoneUpdate", "_counter","_i","_un","_us","_ownerSide","_curZone"];
+private ["_valUpdate", "_zoneUpdate", "_endOpt","_i","_un","_us","_ownerSide","_curZone"];
 
-_counter = _this select 0;
+_endOpt = _this select 0;
 _infUpdate = _this select 1;
 _valUpdate = _this select 2;
-
-
-// _counter = _counter + 1;
 
 //Подсчет обычных солдат (стандартно - по 10 очков за штуку)
 TVD_sidesInfScore = [0,0];
@@ -35,6 +32,28 @@ TVD_sidesInfScore = [0,0];
 		TVD_sidesInfScore set [_us, (TVD_sidesInfScore select _us) + 10];
 	};
 } forEach playableUnits;
+
+
+
+// for [{_i=2},{_i<=(count TVD_TaskObjectsList - 1)},{_i=_i+1}] do {
+	// _un = TVD_TaskObjectsList select _i;
+	// _us = TVD_sides find (_un getVariable "TVD_TaskObject" select 0);
+
+	// if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) ) then {
+		// _un setVariable ["TVD_TaskObject", nil, true];
+		// TVD_TaskObjectsList deleteAt _i;
+		// _i = _i - 1;
+	// } else {
+		// if (_un getVariable "TVD_TaskObject" select 4) then {
+			
+			// TVD_TaskObjectsList set [_us, (TVD_TaskObjectsList select _us) + 1];
+			// TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_un getVariable ["TVD_TaskObject", 0] select 1)];
+			// _un setVariable ["TVD_TaskObject", nil, true];
+			// TVD_TaskObjectsList deleteAt _i;
+			// _i = _i - 1;
+		// };
+	// };
+// };
 
 
 
@@ -97,5 +116,4 @@ TVD_sidesZonesScore = [0,0];
 } forEach TVD_capZones;
 
 
-// if (_counter >= 10) then {_counter = 0};
-[_counter, _infUpdate, _valUpdate, TVD_sidesInfScore, TVD_sidesValScore, TVD_sidesZonesScore, TVD_sidesResScore]
+[_endOpt, _infUpdate, _valUpdate, TVD_sidesInfScore, TVD_sidesValScore, TVD_sidesZonesScore, TVD_sidesResScore]

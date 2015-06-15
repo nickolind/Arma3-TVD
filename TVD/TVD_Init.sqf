@@ -14,6 +14,14 @@ this setVariable ["TVD_UnitValue",[independent,100, "role"]];
 
 Отсчет от жизни 1 бойца = 10 очкам
 
+
+this setVariable ["TVD_TaskObject", [west, 500, "Уничтожить Грады"]];
+
+0 - сторона, которой назначена задача
+1 - цена вопроса
+2 - текст задачи
+3 - если True - задача считается выполненной. Общая проверка: ( (!(alive _un) || (isNull)) || (_un getVariable "TVD_TaskObject" select 2) )
+
 */
 
 private ["_i","_ownerSide","_unitSide"];
@@ -29,6 +37,7 @@ TVD_RetreatRatio = _this select 4;		//Если останется меньше �
 TVD_capZones = [];
 TVD_InitScore = [0,0];
 TVD_ValUnits = [];
+TVD_TaskObjectsList = [0,0];
 trgBase_side0 setVariable ["TVD_BaseSide", TVD_sides select 0];
 trgBase_side1 setVariable ["TVD_BaseSide", TVD_sides select 1];
 
@@ -37,16 +46,18 @@ TVD_sidesValScore = [0,0];
 TVD_sidesZonesScore = [0,0];
 TVD_sidesResScore = [0,0];
 
-timeToEnd = false;
+timeToEnd = -1;
 TVD_HeavyLosses = sideLogic;
 TVD_SideCanRetreat = [false, false, false];		//When the retreat conditions are met
 TVD_SideRetreat = sideLogic;
 TVD_MissionLog = [];
 
-colorToSide = compileFinal preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
-SideToColor = compileFinal preprocessFileLineNumbers "TVD\TVD_util_SideToColor.sqf";
-sideToIndex = compileFinal preprocessFileLineNumbers "TVD\TVD_util_sideToIndex.sqf";
-TVD_unitRole = compileFinal preprocessFileLineNumbers "TVD\TVD_util_unitRole.sqf";
+colorToSide = compile preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
+SideToColor = compile preprocessFileLineNumbers "TVD\TVD_util_SideToColor.sqf";
+sideToIndex = compile preprocessFileLineNumbers "TVD\TVD_util_sideToIndex.sqf";
+TVD_unitRole = compile preprocessFileLineNumbers "TVD\TVD_util_unitRole.sqf";
+// TVD_util_autoEvaluate = compile preprocessFileLineNumbers "TVD\TVD_util_autoEvaluate.sqf";
+TVD_addSideScore = compile preprocessFileLineNumbers "TVD\TVD_util_addSideScore.sqf";
 TVD_Logger = compile preprocessFileLineNumbers "TVD\TVD_util_logger.sqf";
 TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_MissionLogWriter.sqf";
 TVD_util_DebriefWriter = compile preprocessFileLineNumbers "TVD\TVD_util_debriefWriter.sqf";
@@ -54,11 +65,15 @@ TVD_util_DebriefWriter = compile preprocessFileLineNumbers "TVD\TVD_util_debrief
 TVD_CaptureVehicle = compile preprocessFileLineNumbers "TVD\TVD_CaptureVehicle.sqf";
 TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps.sqf";
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
+TVD_HeavyLossesHandler = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesHandler.sqf";
 TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
+// TVD_PreEndMission = compile preprocessFileLineNumbers "TVD\TVD_PreEndMission.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
 TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
 TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
 TVD_SendToResMan = compile preprocessFileLineNumbers "TVD\TVD_SendToResMan.sqf";
+TVD_TaskCompleted = compile preprocessFileLineNumbers "TVD\TVD_TaskCompleted.sqf";
+TVD_TasksKeeper = compile preprocessFileLineNumbers "TVD\TVD_TasksKeeper.sqf";
 TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
 
 
@@ -69,7 +84,6 @@ waitUntil {sleep 3; time > 0};
 publicVariable "TVD_sides";
 publicVariable "TVD_RetreatPossible";
 publicVariable "TVD_SideCanRetreat";
-
 
 
 
@@ -104,6 +118,20 @@ if (TVD_capZonesCount != 0) then {
 } forEach TVD_capZones;
 
 
+
+
+//--------------Составление массива задач миссии
+{
+	if (!isNil {_x getVariable "TVD_TaskObject"}) then {   
+		if (isNil {_x getVariable "TVD_TaskObject" select 4}) then {_x getVariable "TVD_TaskObject" pushBack [0,0,0]};
+		// _x getVariable "TVD_TaskObject" pushBack false;
+		TVD_TaskObjectsList pushBack _x;
+	};
+} forEach allMissionObjects "";
+
+
+
+
 //-------------Посчет живой силы воюющих сторон
 {	
 	if ( (side _x in TVD_sides) ) then {
@@ -123,8 +151,8 @@ if (TVD_capZonesCount != 0) then {
 			};		//Убрать когда напишу util_autoEvaluate
 			
 															//Вызывает логРайтер, который в конце вызовет скорКипер, который удалит TVD_UnitValue убитого юнита
-			_x addMPEventHandler ["mpkilled", {if (isServer) then {null = ["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		// Важно чтобы этот мпэвентхнедлер был вторым, иначе он затрет данные TVD_UnitValue и TVD_HQTransfer не сработает
-																																				
+			_x addMPEventHandler ["mpkilled", {	if (isServer) then {["killed", _this select 0] call TVD_util_MissionLogWriter}	}];		// Важно чтобы этот мпэвентхнедлер был вторым, иначе он затрет данные TVD_UnitValue и TVD_HQTransfer не сработает
+																																
 		} else {
 			_unitSide = TVD_sides find (side _x);
 			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + 10];
@@ -151,8 +179,10 @@ if (TVD_capZonesCount != 0) then {
 			[_this select 0, _this select 2] call TVD_CaptureVehicle;
 		}];
 		// _x addMPEventHandler ["mpkilled", {if (isServer) then {["killed", _this select 0] call TVD_util_MissionLogWriter;}}];
-		_x addMPEventHandler ["mpkilled", {if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 1) ) then {["killed", _this select 0] call TVD_util_MissionLogWriter;}}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
+		
+		_x addMPEventHandler ["mpkilled", {	if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 1) ) then {["killed", _this select 0] call TVD_util_MissionLogWriter}	}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
 	};
 } forEach vehicles;
+
 
 publicVariable "TVD_ValUnits";
