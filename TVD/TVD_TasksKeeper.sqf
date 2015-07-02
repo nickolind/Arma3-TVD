@@ -27,6 +27,7 @@ _tk_Handler = {
 	// (_un getVariable "TVD_TaskObject") set [4, true];
 	TVD_TaskObjectsList set [_us, (TVD_TaskObjectsList select _us) + 1];
 	TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
+	_unitL setVariable ["TVD_TaskObjectStatus", "success", true];
 	_unitL setVariable ["TVD_TaskObject", nil, true];
 	TVD_TaskObjectsList deleteAt _iL;
 	
@@ -38,7 +39,7 @@ _tk_Handler = {
 for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 	_un = TVD_TaskObjectsList select _i;
 	
-	if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) ) then {
+	if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) || ((_un getVariable "TVD_TaskObjectStatus") in ["fail","success"]) ) then {
 		_un setVariable ["TVD_TaskObject", nil, true];
 		TVD_TaskObjectsList deleteAt _i;
 		_i = _i - 1;
@@ -48,7 +49,7 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 			case (_un isKindOf "EmptyDetector") : {
 				
 				if (_endCause >= 0) then {
-					if ( ((_un getVariable "TVD_TaskObject" select 4) select _endCause == 1) && ((_un getVariable "TVD_TaskObject" select 0) != _sufferSide) ) then {
+					if ( (call compile ((_un getVariable "TVD_TaskObject" select 4) select _endCause) ) && ((_un getVariable "TVD_TaskObject" select 0) != _sufferSide) ) then {
 						_un setTriggerStatements ["true", "", ""];
 						waitUntil {sleep 0.1; (triggerActivated _un)};
 					};
@@ -60,6 +61,7 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 				};
 				
 				if (_endIt) then {
+					_un setVariable ["TVD_TaskObjectStatus", "fail", true];
 					_un setVariable ["TVD_TaskObject", nil, true];
 					TVD_TaskObjectsList deleteAt _i;
 					_i = _i - 1;
@@ -69,7 +71,7 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 			case (_un isKindOf "logic") : {
 			
 				if (_endCause >= 0) then {
-					if ( ((_un getVariable "TVD_TaskObject" select 4) select _endCause == 1) && ((_un getVariable "TVD_TaskObject" select 0) != _sufferSide) ) then {
+					if ( (call compile ((_un getVariable "TVD_TaskObject" select 4) select _endCause) ) && ((_un getVariable "TVD_TaskObject" select 0) != _sufferSide) ) then {
 						_un setVariable ["WMT_TaskEnd", true, true];
 					};
 				};
@@ -82,6 +84,7 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 				};
 				
 				if (_endIt) then {
+					_un setVariable ["TVD_TaskObjectStatus", "fail", true];
 					_un setVariable ["TVD_TaskObject", nil, true];
 					TVD_TaskObjectsList deleteAt _i;
 					_i = _i - 1;
@@ -96,102 +99,3 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 _tasksCount
 
 
-
-
-
-
-/*
-
-switch (_this select 0) do {
-
-
-
-	case "check": {			// Режим проверки - не отменяет задачи принудительно
-	
-		for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
-			_un = TVD_TaskObjectsList select _i;
-			
-			if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) ) then {
-				_un setVariable ["TVD_TaskObject", nil, true];
-				TVD_TaskObjectsList deleteAt _i;
-				_i = _i - 1;
-			} else {
-				switch (true) do {
-					case (_un isKindOf "EmptyDetector") : {
-						
-						if (triggerActivated _un) exitWith {
-							[_i] call _tk_Handler;
-							_i = _i - 1;
-						};
-					};
-					case (_un isKindOf "logic") : {
-
-						if (!isNil {_un getVariable "WMT_TaskEnd"}) exitWith {
-							if (_un getVariable "WMT_TaskEnd") then {
-								[_i] call _tk_Handler;
-								_i = _i - 1;
-							};
-						};
-					};
-				};
-			};
-			
-			_tasksCount = count TVD_TaskObjectsList;
-		};
-	};
-	
-	
-	case "finish": {		// Режим завершения - все невыполненные задачи принудительно отменяются
-		
-		for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
-			_un = TVD_TaskObjectsList select _i;
-			
-			if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) ) then {
-				_un setVariable ["TVD_TaskObject", nil, true];
-				TVD_TaskObjectsList deleteAt _i;
-				_i = _i - 1;
-			} else {
-				switch (true) do {
-					case (_un isKindOf "EmptyDetector") : {
-						
-						if (triggerActivated _un) exitWith {
-							[_i] call _tk_Handler;
-							_i = _i - 1;
-						};
-						
-						if (timeToEnd != -1) then {
-							_un setVariable ["TVD_TaskObject", nil, true];
-							TVD_TaskObjectsList deleteAt _i;
-							_i = _i - 1;
-						};
-					};
-					case (_un isKindOf "logic") : {
-
-						if (!isNil {_un getVariable "WMT_TaskEnd"}) exitWith {
-							if (_un getVariable "WMT_TaskEnd") then {
-								[_i] call _tk_Handler;
-								_i = _i - 1;
-							};
-						};
-						
-						if (timeToEnd != -1) then {
-							_un setVariable ["TVD_TaskObject", nil, true];
-							TVD_TaskObjectsList deleteAt _i;
-							_i = _i - 1;
-						};
-					};
-				};
-			};
-			_tasksCount = count TVD_TaskObjectsList;
-		};
-		
-	};
-
-};
-
-
-
-
-
-_tasksCount
-*/

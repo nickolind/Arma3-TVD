@@ -11,13 +11,13 @@ _unit = _this select 1;
 
 switch (_this select 0) do {
 	case "slTransfer" : {
-		_unitValue = _unit getVariable "TVD_UnitValue";
+		_unitValue = (_unit getVariable "TVD_UnitValue") select 0;
 		_eslFound = false;
 		scopeName "depth1";
 		
 		
 		{	
-			if ( (side _x == _unitValue select 0) ) then {
+			if ( (side _x == _unitValue) ) then {
 				
 				{
 					if (!isNil {_x getVariable "TVD_UnitValue"}) then {
@@ -55,13 +55,11 @@ switch (_this select 0) do {
 			};	
 		} forEach allGroups;
 		
-		if !(_eslFound) then {
+		if (!(_eslFound) ) then {
 			//Если замены не найдено:
 			[[ [], {
-				// if (!isNil {player getVariable "TVD_UnitValue"}) then {
-					["taskAssigned",[0, "КС убит. Некому принять командование"]] call bis_fnc_showNotification;
-				// };
-			}],"BIS_fnc_call", _unitValue select 0] call BIS_fnc_MP;
+				["taskAssigned",[0, "КС убит. Некому принять командование"]] call bis_fnc_showNotification;
+			}],"BIS_fnc_call", _unitValue] call BIS_fnc_MP;
 		};
 	};
 	

@@ -59,7 +59,7 @@ if (isServer) then {
 	_TVD_capZonesCount = 	if (count _this > 1) then {_this select 1} else {0};			//Количество присутствующих на миссии зон для захвата.
 	_TVD_RetreatPossible = 	if (count _this > 2) then {_this select 2} else {[true,true,true]};			//[east,west,resistance] - If side has possibility to retreat on a mission
 	_TVD_ZoneGain = 		if (count _this > 3) then {_this select 3} else {50};					//Количество очков за владение одной зоной (50 по умолчанию)
-	_TVD_RetreatRatio = 	if (count _this > 4) then {_this select 4} else {0.75};				//Если останется меньше данного процента - у КСа появится возможность отступить
+	_TVD_RetreatRatio = 	if (count _this > 4) then {_this select 4} else {0.9};				//Если останется меньше данного процента - у КСа появится возможность отступить
 	
 	null = [
 		_TVD_sides, 
@@ -129,7 +129,7 @@ if (isServer) then {
 				waitUntil {
 					sleep 1;
 					_counter = _counter + 1;
-					([(_counter >= 0), _endCause] call TVD_TasksKeeper == 2)
+					([(_counter >= 5), _endCause] call TVD_TasksKeeper == 2)
 				};
 				
 				_missionResults = [_endCause] call TVD_WinCalculations;			//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]

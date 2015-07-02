@@ -24,7 +24,7 @@ _scoreRatio = [0.0,0.0];
 
 for "_i" from 0 to 1 do {
 	// ratio if ((_InitScore select _i) != 0) then {_scoreRatio set [_i, round( (_InitScore select _i - (( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) / (_InitScore select _i)) ) * 1000) / 10];};	// 100.0
-	if ((_InitScore select _i) != 0) then {_scoreRatio set [1-_i, round(((_InitScore select _i) - ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) ) / ((_InitScore select 0) + (_InitScore select 1)) * 1000 ) / 10 ];};	// 100.0
+	if ((_InitScore select _i) != 0) then {_scoreRatio set [1-_i, round(((_InitScore select _i) - ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) ) / ((_InitScore select 0) + (_InitScore select 1) + (_InitScore select 2)) * 1000 ) / 10 ];};	// 100.0
 	
 	if (_retrOn == _i) then {
 		_sRegain = ( (_scoreRatio select (1-_i)) / 2);

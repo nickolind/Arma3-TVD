@@ -34,29 +34,6 @@ TVD_sidesInfScore = [0,0];
 } forEach playableUnits;
 
 
-
-// for [{_i=2},{_i<=(count TVD_TaskObjectsList - 1)},{_i=_i+1}] do {
-	// _un = TVD_TaskObjectsList select _i;
-	// _us = TVD_sides find (_un getVariable "TVD_TaskObject" select 0);
-
-	// if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) ) then {
-		// _un setVariable ["TVD_TaskObject", nil, true];
-		// TVD_TaskObjectsList deleteAt _i;
-		// _i = _i - 1;
-	// } else {
-		// if (_un getVariable "TVD_TaskObject" select 4) then {
-			
-			// TVD_TaskObjectsList set [_us, (TVD_TaskObjectsList select _us) + 1];
-			// TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_un getVariable ["TVD_TaskObject", 0] select 1)];
-			// _un setVariable ["TVD_TaskObject", nil, true];
-			// TVD_TaskObjectsList deleteAt _i;
-			// _i = _i - 1;
-		// };
-	// };
-// };
-
-
-
 //Подсчет ценных юнитов (техника, командиры, ... )
 TVD_sidesValScore = [0,0];
 
@@ -78,7 +55,9 @@ for [{_i=0},{_i<=(count TVD_ValUnits - 1)},{_i=_i+1}] do {
 				_us = TVD_sides find (_un getVariable "TVD_CapOwner");		// !!! _us rewritten
 				TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + ((_un getVariable ["TVD_UnitValue", 0] select 1) / 2)];
 			} else {
-				TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + (_un getVariable ["TVD_UnitValue", 0] select 1)];		//Если текущая сторона-владелец НЕ отличается от изначальной - то начисление как обычно
+				if (_us != -1) then {		// us == -1 когда техника нейтральная (изначально не принадлежит одной из противоборствующих сторон)
+					TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + (_un getVariable ["TVD_UnitValue", 0] select 1)];		//Если текущая сторона-владелец НЕ отличается от изначальной - то начисление как обычно
+				};
 			};
 			
 		} else {	// Этот блок для НЕтехники (нет параметра CapOwner)

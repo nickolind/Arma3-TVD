@@ -46,8 +46,8 @@ _textOut = composeText [_outcome,
 	parseText format ["<t align='center'> <t size='1.8' color='%1'>%2&#37;</t>   &lt;-&gt;   <t size='1.8' color='%3'>%4&#37;</t></t><br/>",_sColor select _si0, _missionResults select 2, _sColor select _si1, _missionResults select 3], 										
 	parseText format ["<t align='center' size='0.7'>(Победила сторона: <t  color='%1'>%2</t>)</t><br/>",_sColor select ([east, west, resistance, civilian, sideLogic] find (_missionResults select 0)), _winner], 										
 	parseText "<t size='0.9' underline='true' shadow='2'>Осталось в живых:</t>", 	parseText "<t size='0.9' underline='true' shadow='2' align='right'>Потери личного состава:</t><br/>",		
-	parseText format ["<t align='right'> <t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t></t>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1], 
-																							parseText format ["<t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t><br/>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
+	parseText format ["<t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1], 
+																							parseText format ["<t align='right'> <t color='%1'>%2</t>   &lt;-&gt;   <t color='%3'>%4</t></t><br/>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
 	parseText " ", 																			parseText "<t align='right'> </t><br/>",
 	parseText "<t underline='true' shadow='2'>Лог событий:</t>",							parseText "<t underline='true' shadow='2' align='right'>Контролируемые зоны:</t>"
 ];

@@ -35,7 +35,7 @@ TVD_RetreatRatio = _this select 4;		//Если останется меньше �
 //------------------------------------------------
 
 TVD_capZones = [];
-TVD_InitScore = [0,0];
+TVD_InitScore = [0,0,0];
 TVD_ValUnits = [];
 TVD_TaskObjectsList = [0,0];
 trgBase_side0 setVariable ["TVD_BaseSide", TVD_sides select 0];
@@ -105,15 +105,18 @@ if (TVD_capZonesCount != 0) then {
 		_ownerSide = TVD_sides find (_x select 1);
 		TVD_InitScore set [_ownerSide, (TVD_InitScore select _ownerSide) + TVD_ZoneGain];
 	} else {
-		[_x select 0] spawn {
+		TVD_InitScore set [2, (TVD_InitScore select 2) + TVD_ZoneGain]; 
+		// Если зона на старте миссии никому не принадлежит, то формально она становится нейтральной:
+		// Очки за нее добавляются к общему пулу очков, но преимущества ни одна из сторон не получает.
+		
+		/*
+		[[ [_x select 0], {	
 			while {true} do {
-				[[ [_this select 0], {	
-					hint format ["ОШИБКА!\nЗОНЕ\n\n%1\n\nНЕ ПРИПИСАНА ИЗНАЧАЛЬНАЯ СТОРОНА-ВЛАДЕЛЕЦ.", _this select 0];	// У зоны всегда должна быть выставленна изначальная сторона-владелец из списка сторон TVD_sides
-				}],"BIS_fnc_call"] call BIS_fnc_MP;
+				hint format ["ОШИБКА!\nЗОНЕ\n\n%1\n\nНЕ ПРИПИСАНА ИЗНАЧАЛЬНАЯ СТОРОНА-ВЛАДЕЛЕЦ.", _this select 0];	// У зоны всегда должна быть выставленна изначальная сторона-владелец из списка сторон TVD_sides
 				sleep (5 + random 5);
 			};
-		};
-			//TVD_InitScore set [0, (TVD_InitScore select 0) + TVD_ZoneGain];		// Если зона на старте миссии никому не принадлежит, то формально она приписывается Стороне0 - на расстановку сил не влияет, однако без такого хака, очки за зоны выпадут из формулы и нарушится баланс (полезут отрицательные соотношения).
+		}],"BIS_fnc_call"] call BIS_fnc_MP;
+		*/
 	};
 } forEach TVD_capZones;
 
@@ -123,8 +126,25 @@ if (TVD_capZonesCount != 0) then {
 //--------------Составление массива задач миссии
 {
 	if (!isNil {_x getVariable "TVD_TaskObject"}) then {   
-		if (isNil {_x getVariable "TVD_TaskObject" select 4}) then {_x getVariable "TVD_TaskObject" pushBack [0,0,0]};
-		// _x getVariable "TVD_TaskObject" pushBack false;
+		if (isNil {_x getVariable "TVD_TaskObject" select 4}) then {
+			_x getVariable "TVD_TaskObject" pushBack ["false","false","false"]
+		
+		
+		} else {		//Проверка правильности условий задачи - если результат в кавычках не Boolean (== true || == false), будет выдаваться ошибка
+			{
+				if !( (call compile _x) || !(call compile _x) ) exitWith {
+					[[ [_x], {	
+						while {true} do {
+							hint format ["ОШИБКА!\nОшибка в условии задачи:\n\n%1", _this select 0];
+							sleep (5 + random 5);
+						};
+					}],"BIS_fnc_call"] call BIS_fnc_MP;
+				};
+			} forEach (_x getVariable "TVD_TaskObject" select 4);
+		};
+		
+		_x setVariable ["TVD_TaskObjectStatus", "", true];
+		
 		TVD_TaskObjectsList pushBack _x;
 	};
 } forEach allMissionObjects "";
@@ -167,6 +187,7 @@ if (TVD_capZonesCount != 0) then {
 {
 	if (!isNil {_x getVariable "TVD_UnitValue"}) then {
 		_unitSide = TVD_sides find ( _x getVariable "TVD_UnitValue" select 0 );
+		if (_unitSide == -1) then {_unitSide = 2};
 		
 		TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + (_x getVariable "TVD_UnitValue" select 1)];
 		TVD_ValUnits pushBack _x;
