@@ -25,13 +25,14 @@ _scoreRatio = [0.0,0.0];
 for "_i" from 0 to 1 do {
 	// ratio if ((_InitScore select _i) != 0) then {_scoreRatio set [_i, round( (_InitScore select _i - (( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) / (_InitScore select _i)) ) * 1000) / 10];};	// 100.0
 	if ((_InitScore select _i) != 0) then {_scoreRatio set [1-_i, round(((_InitScore select _i) - ( (_sidesInfScore select _i) + (_sidesValScore select _i) + (_sidesZonesScore select _i) + (_sidesResScore select _i) ) ) / ((_InitScore select 0) + (_InitScore select 1) + (_InitScore select 2)) * 1000 ) / 10 ];};	// 100.0
-	
-	if (_retrOn == _i) then {
-		_sRegain = ( (_scoreRatio select (1-_i)) / 2);
-		_scoreRatio set [1-_i, (_scoreRatio select (1-_i)) - _sRegain];		//если сторона отступила, половина полученных очков преимущества другой стороны отнимаются	
-	};
+
 };
+
 if (_retrOn != -1) then {
+	
+	_sRegain = ( (0 max (_scoreRatio select (1-_retrOn))) - (0 min (_scoreRatio select _retrOn)) ) / 2;
+	_scoreRatio set [1-_retrOn, (_scoreRatio select (1-_retrOn)) - _sRegain];		//если сторона отступила, половина полученных очков преимущества другой стороны отнимаются
+	
 	null = ["retreatScore", (TVD_sides select _retrOn), _sRegain] call TVD_util_MissionLogWriter;
 };
 

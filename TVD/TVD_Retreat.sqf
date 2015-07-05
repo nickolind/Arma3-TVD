@@ -44,10 +44,12 @@ for "_i" from 0 to (count TVD_ValUnits - 1) do {
 
 //Отдаем под контроль другой стороне все зоны и очки за них, соответственно, тоже
 {
-	if (getMarkerColor (_x select 0) == (_sideRetreats call SideToColor)) then {
-		_retLossLog = composeText [_retLossLog, parseText format ["%1, ", markerText (_x select 0)]];
+	if !(_x select 2) then {
+		if (getMarkerColor (_x select 0) == (_sideRetreats call SideToColor)) then {
+			_retLossLog = composeText [_retLossLog, parseText format ["%1, ", markerText (_x select 0)]];
+		};
+		(_x select 0) setMarkerColor (_sideStays call SideToColor);
 	};
-	(_x select 0) setMarkerColor (_sideStays call SideToColor);
 } forEach TVD_capZones;
 
 //Высчитываем общий счет без учета того, что сторона отступила - для лога и сравнения значений потом
@@ -56,11 +58,5 @@ null = [_stats] call TVD_Logger;
 
 //Потери стороны при отступлении:
 ["retreatLossList",_retLossLog,TVD_sides find _sideRetreats] call TVD_util_MissionLogWriter;
-
-// Теперь компенсируем потери отступившей стороны и пишем в лог об этом
-// _stats = [3,TVD_sides find _sideRetreats] call TVD_WinCalculations;		//Отступает сторона 0 или сторон 1 из TVD_sides
-
-
-// _stats
 
 true 

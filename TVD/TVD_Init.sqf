@@ -24,7 +24,7 @@ this setVariable ["TVD_TaskObject", [west, 500, "Уничтожить Грады
 
 */
 
-private ["_i","_ownerSide","_unitSide"];
+private ["_i","_ownerSide","_unitSide","_mLock"];
 
 //-------------Параметры, которые можно/нужно настроить в ТВД для правильной работы-------------------
 TVD_sides = _this select 0;
@@ -92,8 +92,16 @@ waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when fre
 
 //--- Настройка: количество зон
 if (TVD_capZonesCount != 0) then {
+	_mLock = 0;
+	
 	for "_i" from 0 to (TVD_capZonesCount - 1) do {
-		TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide ];
+		{
+			if ((_x getVariable  ["Marker", "false"]) == ("mZone_" + str _i)) then {
+				_mLock = _x getVariable ["Lock",0];
+			};
+		} forEach (allMissionObjects "Logic");
+		TVD_capZones pushBack [ ("mZone_" + str _i), (getMarkerColor ("mZone_" + str _i)) call colorToSide, (_mLock == 1) ];
+		//[ИмяМаркера, Цвет-ПринадлежностьСтороне, Блокированный]
 	};
 };
 

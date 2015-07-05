@@ -21,7 +21,10 @@ switch (_us) do {
 		}],"BIS_fnc_call"] call BIS_fnc_MP;
 	};
 	default {
-		TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + _score];
+		TVD_InitScore set [1-_us, (TVD_InitScore select (1-_us)) + _score];
+		
+		// TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + _score];
+		
 		if (_logIt) then {
 			[_this select 0,_message,_notify] call TVD_TaskCompleted;
 		};

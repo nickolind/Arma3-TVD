@@ -147,7 +147,7 @@ if (isServer) then {
 				waitUntil {
 					sleep 1;
 					_counter = _counter + 1;
-					([(_counter >= 30), _endCause] call TVD_TasksKeeper == 2)
+					([(_counter >= 10), _endCause] call TVD_TasksKeeper == 2)
 				};
 				
 				_missionResults = [_endCause] call TVD_WinCalculations;			//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]			

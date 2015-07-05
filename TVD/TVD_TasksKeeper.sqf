@@ -26,7 +26,11 @@ _tk_Handler = {
 
 	// (_un getVariable "TVD_TaskObject") set [4, true];
 	TVD_TaskObjectsList set [_us, (TVD_TaskObjectsList select _us) + 1];
-	TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
+	
+	TVD_InitScore set [1-_us, (TVD_InitScore select (1-_us)) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
+		
+	// TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
+	
 	_unitL setVariable ["TVD_TaskObjectStatus", "success", true];
 	_unitL setVariable ["TVD_TaskObject", nil, true];
 	TVD_TaskObjectsList deleteAt _iL;
