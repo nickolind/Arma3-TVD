@@ -96,7 +96,7 @@ if ([_sideWinner] call hlh_fnc_tasksCount == 0) then {
 	if ( (isServer) || (playerSide == _this select 0) ) then {
 		private ["_time","_waitTime","_res"];
 		
-		[format ["Противник понес тяжелые потери.<br/>Миссия завершится через %1.",[hlh_ttw,"MM:SS"] call BIS_fnc_secondsToString],0,0,5,0.2] call bis_fnc_dynamictext;
+		[format ["Количество вражеских сил на поле боя слишком мало.<br/>Миссия завершится через %1.",[hlh_ttw,"MM:SS"] call BIS_fnc_secondsToString],0,0,5,0.2] call bis_fnc_dynamictext;
 		
 		_time = serverTime;
 		_waitTime = hlh_ttw;	
@@ -107,22 +107,23 @@ if ([_sideWinner] call hlh_fnc_tasksCount == 0) then {
 			
 			if !(isDedicated) then {	
 			
-				hint format ["Противник понес тяжелые потери.\nМиссия завершится через:\n\n%1",[_waitTime,"MM:SS"] call BIS_fnc_secondsToString];	
+				hint format ["Количество вражеских сил на поле боя слишком мало.\nМиссия завершится через:\n\n%1",[_waitTime,"MM:SS"] call BIS_fnc_secondsToString];	
 					
-
-				if ( (player getVariable "TVD_UnitValue" select 2 in ["sideLeader","execSideLeader"]) && (_waitTime < 60) && (hlh_actContinueAdded != -2) ) then {
-					titleText ["Вы можете продлить время, если сторона не успевает выполнить задачи.\nИспользуйте ActionMenu -> 'Продлить миссию'.", "PLAIN DOWN"];
-					
-					if (hlh_actContinueAdded == -1) then {
-						hlh_actContinueAdded = player addAction ["<t color='#ffffff'>КС: Продлить миссию (макс. +5 мин.)</t>", {
-							
-							hlh_ttw = ((hlh_ttw + 300) min ((WMT_Global_LeftTime select 0) - 40));
-							publicVariable "hlh_ttw";
-							player removeAction hlh_actContinueAdded;
-							hlh_actContinueAdded = -2;
-							publicVariable "hlh_actContinueAdded";
-							
-						}, 1, 0, false, true, "", "(_target == _this) && (hlh_actContinueAdded != -2)"];
+				if ( !isNil{player getVariable "TVD_UnitValue" select 2} ) then {
+					if ( (player getVariable "TVD_UnitValue" select 2 in ["sideLeader","execSideLeader"]) && (_waitTime < 60) && (hlh_actContinueAdded != -2) ) then {
+						titleText ["Вы можете продлить время, если сторона не успевает выполнить задачи.\nИспользуйте ActionMenu >> 'Продлить миссию'.", "PLAIN DOWN"];
+						
+						if (hlh_actContinueAdded == -1) then {
+							hlh_actContinueAdded = player addAction ["<t color='#ffffff'>КС: Продлить миссию (макс. +5 мин.)</t>", {
+								
+								hlh_ttw = ((hlh_ttw + 300) min ((WMT_Global_LeftTime select 0) - 40));
+								publicVariable "hlh_ttw";
+								player removeAction hlh_actContinueAdded;
+								hlh_actContinueAdded = -2;
+								publicVariable "hlh_actContinueAdded";
+								
+							}, 1, 0, false, true, "", "(hlh_actContinueAdded != -2)"];
+						};
 					};
 				};
 					

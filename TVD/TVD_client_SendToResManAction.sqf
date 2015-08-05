@@ -18,7 +18,7 @@ while {true} do {
 	waitUntil {sleep 5; ( 
 		( ( (player in list trgBase_side0) && (side group player == TVD_sides select 0) ) 
 		|| 
-		( (player in list trgBase_side1) && (side group player == TVD_sides select 0) ) )
+		( (player in list trgBase_side1) && (side group player == TVD_sides select 1) ) )
 	&& _actAdded != 1 ) };
 		
 	_actTargets = [];

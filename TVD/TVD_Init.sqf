@@ -40,6 +40,8 @@ TVD_ValUnits = [];
 TVD_TaskObjectsList = [0,0];
 trgBase_side0 setVariable ["TVD_BaseSide", TVD_sides select 0];
 trgBase_side1 setVariable ["TVD_BaseSide", TVD_sides select 1];
+TVD_SoldierCost = 10;
+TVD_RetrCount = [0,0];
 
 TVD_sidesInfScore = [0,0];
 TVD_sidesValScore = [0,0];
@@ -48,9 +50,11 @@ TVD_sidesResScore = [0,0];
 
 timeToEnd = -1;
 TVD_HeavyLosses = sideLogic;
+TVD_MissionComplete = sideLogic;
 TVD_SideCanRetreat = [false, false, false];		//When the retreat conditions are met
 TVD_SideRetreat = sideLogic;
 TVD_MissionLog = [];
+
 
 colorToSide = compile preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
 SideToColor = compile preprocessFileLineNumbers "TVD\TVD_util_SideToColor.sqf";
@@ -67,8 +71,10 @@ TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
 TVD_HeavyLossesHandler = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesHandler.sqf";
 TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
+TVD_MissionCompleteHandler = compile preprocessFileLineNumbers "TVD\TVD_MissionCompleteHandler.sqf";
 // TVD_PreEndMission = compile preprocessFileLineNumbers "TVD\TVD_PreEndMission.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
+TVD_RetreatSoldier = compile preprocessFileLineNumbers "TVD\TVD_RetreatSoldier.sqf";
 TVD_ScoreKeeper = compile preprocessFileLineNumbers "TVD\TVD_ScoreKeeper.sqf";
 TVD_SendToRes = compile preprocessFileLineNumbers "TVD\TVD_SendToRes.sqf";
 TVD_SendToResMan = compile preprocessFileLineNumbers "TVD\TVD_SendToResMan.sqf";
@@ -134,8 +140,12 @@ if (TVD_capZonesCount != 0) then {
 //--------------Составление массива задач миссии
 {
 	if (!isNil {_x getVariable "TVD_TaskObject"}) then {   
+		if (isNil {_x getVariable "TVD_TaskObject" select 3}) then {
+			_x getVariable "TVD_TaskObject" pushBack true;
+		};
 		if (isNil {_x getVariable "TVD_TaskObject" select 4}) then {
-			_x getVariable "TVD_TaskObject" pushBack ["false","false","false"]
+			_x getVariable "TVD_TaskObject" pushBack ["false","false","false","false"];
+			_x getVariable "TVD_TaskObject" pushBack false;
 		
 		
 		} else {		//Проверка правильности условий задачи - если результат в кавычках не Boolean (== true || == false), будет выдаваться ошибка
@@ -183,7 +193,7 @@ if (TVD_capZonesCount != 0) then {
 																																
 		} else {
 			_unitSide = TVD_sides find (side _x);
-			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + 10];
+			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + TVD_SoldierCost];
 		};
 		
 		_x setVariable ['AGM_isCaptive', false, true];

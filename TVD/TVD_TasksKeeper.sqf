@@ -9,10 +9,11 @@ private ["_un","_i","_tasksCount","_tk_Handler","_endCause","_endIt","_sufferSid
 
 
 _endIt = _this select 0;
-_endCause = if (count _this >= 2) then {[0,0,1,2] select (_this select 1)} else {-1};	// 0 - админ/время, 1 - потери, 2 - отступление
+_endCause = if (count _this >= 2) then {[0,0,1,2,3] select (_this select 1)} else {-1};	// 0 - админ/время, 1 - потери, 2 - отступление, 3 - задачи выполнены
 _sufferSide = sideLogic; 
 if (_endCause == 1) then {_sufferSide = TVD_HeavyLosses};
 if (_endCause == 2) then {_sufferSide = TVD_SideRetreat};
+// if (_endCause == 3) then {_sufferSide = TVD_sides select (1 - (TVD_sides find TVD_MissionComplete))};
 _tasksCount = count TVD_TaskObjectsList;
 
 _tk_Handler = {
@@ -28,12 +29,16 @@ _tk_Handler = {
 	TVD_TaskObjectsList set [_us, (TVD_TaskObjectsList select _us) + 1];
 	
 	TVD_InitScore set [1-_us, (TVD_InitScore select (1-_us)) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
-		
 	// TVD_sidesResScore set [_us, (TVD_sidesResScore select _us) + (_unitL getVariable ["TVD_TaskObject", 0] select 1)];
+	
+	//Если задача ключевая - присвоить переменной TVD_MissionComplete сторону-победителя
+	if (_unitL getVariable "TVD_TaskObject" select 5) then {TVD_MissionComplete = _sideL};
 	
 	_unitL setVariable ["TVD_TaskObjectStatus", "success", true];
 	_unitL setVariable ["TVD_TaskObject", nil, true];
 	TVD_TaskObjectsList deleteAt _iL;
+	
+	
 	
 	[_sideL,_messageL,_showMessageTo] call TVD_TaskCompleted;
 };
@@ -45,6 +50,7 @@ for [{_i=2},{_i<=(_tasksCount - 1)},{_i=_i+1}] do {
 	
 	if ( (isNull _un) || (isNil {_un getVariable "TVD_TaskObject"}) || ((_un getVariable "TVD_TaskObjectStatus") in ["fail","success"]) ) then {
 		_un setVariable ["TVD_TaskObject", nil, true];
+		_un setVariable ["TVD_TaskObjectStatus", "fail", true];
 		TVD_TaskObjectsList deleteAt _i;
 		_i = _i - 1;
 	} else {

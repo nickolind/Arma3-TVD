@@ -66,6 +66,14 @@ switch (_type) do {
 		_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2</t> отправили <t color='%3'>%4</t> в свои тылы.</t>", _sColor select _si1, _side, _sColor select _si0, _unitName];
 	};
 	
+	case "retreatSoldier": {
+		_varUni = _this select 1;		//Массив с готовыми данными
+		_si0 = [east, west, resistance, civilian, sideLogic] find (_varUni select 1 );
+		_unitName = _varUni select 0;
+		_unitRole = _varUni select 2;
+		_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2(%3)</t> самостоятельно отступил в свои тылы.</t>", _sColor select _si0, _unitName, _unitRole];
+	};
+	
 	case "retreatScore": {
 		_side = _this select 1;
 		_si0 = [east, west, resistance, civilian, sideLogic] find _side;
@@ -89,6 +97,7 @@ switch (_type) do {
 	
 	case "killed": {
 		_unit = _this select 1;
+		if (!(((_unit getVariable ["TVD_UnitValue", sideLogic]) select 0) in TVD_Sides) || (_unit getVariable ["TVD_soldierRetreats", false]) ) exitWith {_lCancel = true;};
 		
 		if (!isNil{_unit getVariable "TVD_UnitValue" select 2}) then {
 			if (_unit getVariable "TVD_UnitValue" select 2 in ["soldier","squadLeader"]) exitWith {
@@ -101,7 +110,10 @@ switch (_type) do {
 		
 		if (_unit isKindof "Man") then {
 			_unitName = name _unit;
-			_unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
+			_unitRole = (if (isnil {_unit getVariable "TVD_UnitValue" select 2}) then {""} else {
+				((_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole);
+			});
+			// _unitRole = (_unit getVariable "TVD_UnitValue" select 2) call TVD_unitRole;
 			_plot = parseText format ["<t size='0.7' shadow='2'><t color='%1'>%2(%3)</t> пропал без вести.</t>", _sColor select _si0, _unitName, _unitRole];
 		} else {
 			_unitName = getText (configFile >> "CfgVehicles" >> (typeof _unit) >> "displayName");

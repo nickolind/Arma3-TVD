@@ -27,20 +27,20 @@ if (!isNil {player getVariable "TVD_UnitValue"}) then {
 				
 				player addAction ["<t color='#ffffff'>КС: Команда на отступление</t>", {
 					retrAction = 2;
-				}, 1, 0, false, true, "", "retrAction == 1"];
+				}, 1, 0, false, false, "", "(retrAction == 1) && (timeToEnd == -1)"];
 				
-				player addAction ["<t color='#ffffff'>ОТСТУПЛЕНИЕ: Подтвердить</t>", {
+				player addAction ["<t color='#ffffff'>ОТСТУПЛЕНИЕ: Подтвердить завершение миссии</t>", {
 					retrAction = 3;
 					_rand = 1 + floor random 5;
 					for "_i" from 0 to 6 do {
 						if (_i == _rand) then {
-							_ai = player addAction ["<t color='#ffffff'>ОТСТУПЛЕНИЕ: Да, я уверен - завершить миссию</t>", {
+							_ai = player addAction ["<t color='#ffffff'>ОТСТУПЛЕНИЕ: Подтвердить (все кто СЕЙЧАС не в тыловой зоне - сдадутся в плен)</t>", {
 								retrAction = 0;
 								{player removeAction _x} forEach actIndex;
 								actIndex = nil;
 								TVD_SideRetreat = side player;
 								publicVariableServer "TVD_SideRetreat";
-							}, 1, 0, false, true, "", ""];
+							}, 1, 0, false, true, "", "(timeToEnd == -1)"];
 							actIndex pushBack _ai;
 						} else {
 							_ai = player addAction ["<t color='#8BC8D6'>ОТСТУПЛЕНИЕ: Отмена</t>", {
@@ -51,11 +51,11 @@ if (!isNil {player getVariable "TVD_UnitValue"}) then {
 							actIndex pushBack _ai;
 						};
 					};	
-				}, 1, 0, false, true, "", "retrAction == 2"];
+				}, 1, 0, false, false, "", "(retrAction == 2) && (timeToEnd == -1)"];
 				
 				player addAction ["<t color='#8BC8D6'>ОТСТУПЛЕНИЕ: Отмена</t>", {
 					retrAction = 1;
-				}, 1, 0, false, true, "", "retrAction == 2"];
+				}, 1, 0, false, true, "", "(retrAction == 2)"];
 			};
 		};
 		

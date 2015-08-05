@@ -44,6 +44,7 @@ if !(isDedicated) then {
 	null = [] execVM "TVD\TVD_client_RetreatAction.sqf";
 	null = [] execVM "TVD\TVD_client_SendToResAction.sqf";
 	null = [] execVM "TVD\TVD_client_SendToResManAction.sqf";
+	null = [] execVM "TVD\TVD_client_retreatSoldierAction.sqf";
 };
 
 
@@ -204,6 +205,28 @@ if (isServer) then {
 						//Теперь компенсируем потери отступившей стороны и пишем в лог об этом
 				_missionResults = [_endCause, TVD_sides find TVD_SideRetreat] call TVD_WinCalculations;		//Отступает сторона 0 или сторона 1 из TVD_sides			
 				sleep 3;
+				[_missionResults,_endCause, false] spawn TVD_EndMissionPreps;
+			};
+			
+			case (TVD_MissionComplete != sideLogic): {
+				_endCause = 4;
+				mch_result = false;
+				
+				timeToEnd = _endCause;
+				
+				[_endCause] spawn {
+					waitUntil {
+						if (mch_result) exitWith {true};
+						if ([false, _this select 0] call TVD_TasksKeeper == 2) exitWith {true};
+						sleep 2;
+					};
+				};
+				
+				mch_result = [TVD_MissionComplete] call TVD_MissionCompleteHandler;
+				
+				null = [true, _endCause] call TVD_TasksKeeper;
+						//Теперь компенсируем потери отступившей стороны и пишем в лог об этом
+				_missionResults = [_endCause] call TVD_WinCalculations;			// Функция TVD_WinCalculations вызывается из TVD_HeavyLossesHandler - нет надобности вызывать еще раз из Main			
 				[_missionResults,_endCause, false] spawn TVD_EndMissionPreps;
 			};
 		};
