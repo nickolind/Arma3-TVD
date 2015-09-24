@@ -46,7 +46,7 @@ switch (true) do {
 	case (abs(_ratioDiff) > 12) : {		//Уверенная победа
 		_superiority = 2;
 	};
-	case (abs(_ratioDiff) > 7) : {		//Преимущественная победа
+	case (abs(_ratioDiff) > 6) : {		//Преимущественная победа
 		_superiority = 1;
 	};
 	DEFAULT {		//Ничья
