@@ -45,7 +45,7 @@ while {true} do {
 				};
 				
 				
-			}, nil, 0, false, true, "", "((_target in list trgBase_side0) || (_target in list trgBase_side1)) && (alive _target) && (_target getVariable 'AGM_isCaptive')"];
+			}, nil, 0, false, true, "", "((_target in list trgBase_side0) || (_target in list trgBase_side1)) && (alive _target) && (_target getVariable ['ace_captives_ishandcuffed', false])"]; // Перевод на ACE 	// (_target getVariable 'AGM_isCaptive')
 			
 			_actTargets pushBack [_x, _actID];
 		};

@@ -80,7 +80,7 @@ if (isServer) then {
 
 	waitUntil {sleep 5; (WMT_pub_frzState >= 3) && (!isNil {WMT_Global_LeftTime})}; //==3 when freeze over, ==1 when freeze up
 
-	sleep 30;
+	sleep 10;
 	
 	[] spawn {		//Раз в 5мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)
 		private ["_mTime","_mWaitTime"];
@@ -96,7 +96,7 @@ if (isServer) then {
 			waitUntil {
 				sleep 2; 
 				_mWaitTime = diag_tickTime - _mTime;
-				_mWaitTime > 300
+				_mWaitTime > 600
 			};
 		};
 	};
@@ -142,7 +142,6 @@ if (isServer) then {
 			//------Вышло время
 			case (WMT_Global_LeftTime select 0  < 300): {
 				_endCause = 1;
-				
 				timeToEnd = _endCause;
 				
 				waitUntil {
@@ -151,28 +150,29 @@ if (isServer) then {
 					([(_counter >= 10), _endCause] call TVD_TasksKeeper == 2)
 				};
 				
+				// em_result = [_endCause] call TVD_EndMissionHandler;
+				
 				_missionResults = [_endCause] call TVD_WinCalculations;			//Формат вывода TVD_WinCalculations: _winSide, _superiority (0,1,2,3), _ratioBalance1, _ratioBalance2, [_scoreRatio0, _scoreRatio1]			
 				[_missionResults,_endCause, false] spawn TVD_EndMissionPreps;
 			};
 			
 			
 			
-			//------Потери 90%
+			//------Потери
 			case (TVD_HeavyLosses != sideLogic): {
 				_endCause = 2;
-				hlh_result = false;
-				
+				em_result = false;
 				timeToEnd = _endCause;
 				
 				[_endCause] spawn {
 					waitUntil {
-						if (hlh_result) exitWith {true};
+						if (em_result) exitWith {true};
 						if ([false, _this select 0] call TVD_TasksKeeper == 2) exitWith {true};
 						sleep 2;
 					};
 				};
 				
-				hlh_result = [TVD_HeavyLosses] call TVD_HeavyLossesHandler;
+				em_result = [_endCause, TVD_HeavyLosses] call TVD_EndMissionHandler;
 				
 				null = [true, _endCause] call TVD_TasksKeeper;
 				
@@ -185,13 +185,14 @@ if (isServer) then {
 			//------Сторона отступила
 			case (TVD_SideRetreat != sideLogic): {
 				_endCause = 3;
-				sr_result = false;
-				
+				// sr_result = false;
+				em_result = false;
 				timeToEnd = _endCause;
 				
 				[_endCause] spawn {
 					waitUntil {
-						if (sr_result) exitWith {true};
+						// if (sr_result) exitWith {true};
+						if (em_result) exitWith {true};
 						if ([false, _this select 0] call TVD_TasksKeeper == 2) exitWith {true};
 						sleep 1;
 					};
@@ -199,7 +200,9 @@ if (isServer) then {
 				
 				sleep 5;
 				
-				sr_result = [TVD_SideRetreat] call TVD_Retreat;
+				// sr_result = [TVD_SideRetreat] call TVD_Retreat;
+				null = [TVD_SideRetreat] call TVD_Retreat;
+				em_result = [_endCause, TVD_SideRetreat] call TVD_EndMissionHandler;
 				
 				null = [true, _endCause] call TVD_TasksKeeper;
 						//Теперь компенсируем потери отступившей стороны и пишем в лог об этом
@@ -208,21 +211,23 @@ if (isServer) then {
 				[_missionResults,_endCause, false] spawn TVD_EndMissionPreps;
 			};
 			
+			
+			
+			//------Выполнена ключевая задача
 			case (TVD_MissionComplete != sideLogic): {
 				_endCause = 4;
-				mch_result = false;
-				
+				em_result = false;
 				timeToEnd = _endCause;
 				
 				[_endCause] spawn {
 					waitUntil {
-						if (mch_result) exitWith {true};
+						if (em_result) exitWith {true};
 						if ([false, _this select 0] call TVD_TasksKeeper == 2) exitWith {true};
 						sleep 2;
 					};
 				};
 				
-				mch_result = [TVD_MissionComplete] call TVD_MissionCompleteHandler;
+				em_result = [_endCause, TVD_MissionComplete] call TVD_EndMissionHandler;
 				
 				null = [true, _endCause] call TVD_TasksKeeper;
 						//Теперь компенсируем потери отступившей стороны и пишем в лог об этом

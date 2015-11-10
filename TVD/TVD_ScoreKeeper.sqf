@@ -14,10 +14,10 @@ _valUpdate = _this select 2;
 TVD_sidesInfScore = [0,0];
 
 {
-	if ( (side group _x in TVD_sides) && (isPlayer _x) && (isNil {_x getVariable "TVD_UnitValue"}) ) then {
+	if ( (side group _x in TVD_sides) && (isPlayer _x) && (isNil {_x getVariable "TVD_UnitValue"}) && !(_x getVariable ["TVD_soldierSentToRes", false]) ) then {
 		_us = TVD_sides find (side group _x);
 		
-		if (_x getVariable 'AGM_isCaptive') then {			// !!! _us rewritten
+		if (_x getVariable ['ace_captives_ishandcuffed', false]) then {			// Перевод на ACE	// if (_x getVariable 'AGM_isCaptive') then {			// !!! _us rewritten
 			if ((vehicle _x in list trgBase_side0) || (vehicle _x in list trgBase_side1) ) then {
 				//Если солдат пленен и находится на тыловой зоне вражеской стороны:
 				if ( 	( (vehicle _x in list trgBase_side0) && ((side group _x) != (trgBase_side0 getVariable "TVD_BaseSide")) ) 
@@ -62,7 +62,7 @@ for [{_i=0},{_i<=(count TVD_ValUnits - 1)},{_i=_i+1}] do {
 			
 		} else {	// Этот блок для НЕтехники (нет параметра CapOwner)
 			
-			if ( (_un getVariable 'AGM_isCaptive') ) then {			// !!! _us rewritten
+			if (_un getVariable ['ace_captives_ishandcuffed', false]) then {			// if ( (_un getVariable 'AGM_isCaptive') ) then {			// !!! _us rewritten
 				if ((vehicle _un in list trgBase_side0) || (vehicle _un in list trgBase_side1) ) then {
 					//Если солдат пленен и находится на тыловой зоне вражеской стороны:
 					if ( 	( (vehicle _un in list trgBase_side0) && ((_un getVariable "TVD_UnitValue" select 0) != (trgBase_side0 getVariable "TVD_BaseSide")) ) 
@@ -74,7 +74,7 @@ for [{_i=0},{_i<=(count TVD_ValUnits - 1)},{_i=_i+1}] do {
 				};
 			}; 
 			
-			if (isPlayer _un) then {	//не считать, если юнит - бот
+			if ( (isPlayer _un) && !(_un getVariable ["TVD_soldierSentToRes", false]) ) then {	//не считать, если юнит - бот
 				TVD_sidesValScore set [_us, (TVD_sidesValScore select _us) + (_un getVariable ["TVD_UnitValue", 0] select 1)];
 			};
 		};

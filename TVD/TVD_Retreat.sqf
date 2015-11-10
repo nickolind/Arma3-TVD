@@ -15,14 +15,19 @@ if (_sideRetreats == TVD_sides select 0) then {_trigger = trgBase_side0; _sideSt
 if (_sideRetreats == TVD_sides select 1) then {_trigger = trgBase_side1; _sideStays = TVD_sides select 0};
 
 _trigger setTriggerActivation ["ANY","PRESENT",true];
-{																		//Убиваем всех кто не в зоне из отступившей стороны
+
+//Убиваем всех кто не в зоне из отступившей стороны
+{																		
 	if ((side group _x == _sideRetreats) && !(_x in list _trigger)) then { 
-		[[ [], { 	["<t color='#e50000'>Вас бросили при отступлении</t>", 0, 0.7, 4, 0.2] spawn bis_fnc_dynamictext; 	 }],"BIS_fnc_call", _x] call BIS_fnc_MP; 
+		
+		if (isPlayer _x) then {
+			[[ [], { 	["<t color='#e50000'>Вас бросили при отступлении</t>", 0, 0.7, 4, 0.2] spawn bis_fnc_dynamictext; 	 }],"BIS_fnc_call", _x] call BIS_fnc_MP; 
+		};
 		
 		if !(isNil{_x getVariable "TVD_UnitValue" select 2}) then {
-			_retLossLog = composeText [_retLossLog, parseText format ["%1(%2), ", name _x, (_x getVariable "TVD_UnitValue" select 2) call TVD_unitRole]];
+			_retLossLog = composeText [_retLossLog, parseText format ["%1(%3-%2), ", name _x, (_x getVariable "TVD_UnitValue" select 2) call TVD_unitRole, _x getVariable "TVD_GroupID"]];
 		} else {
-			_retLossLog = composeText [_retLossLog, parseText format ["%1, ", name _x]];
+			_retLossLog = composeText [_retLossLog, parseText format ["%1(%2), ", name _x, _x getVariable "TVD_GroupID"]];
 		};
 		
 		_x setDamage 1;

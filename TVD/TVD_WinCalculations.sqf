@@ -12,6 +12,26 @@ if (count _this >= 1) then {_endOpt = _this select 0};
 if (count _this >= 2) then {_retrOn = _this select 1};			//0 или 1 для массива: TVD_sides = [side0, side1];
 _sRegain = 0.0;
 
+
+// При завершении миссии - всех пленников в тыловой зоне отправлять в тылы стороны - появится соообщение в логе.
+if (_endOpt != -1) then {
+	{
+		if (_x getVariable ['ace_captives_ishandcuffed', false]) then {
+			if ((vehicle _x in list trgBase_side0) || (vehicle _x in list trgBase_side1) ) then {
+				if ( 	( (vehicle _x in list trgBase_side0) && ((side group _x) != (trgBase_side0 getVariable "TVD_BaseSide")) ) 
+						|| 
+						( (vehicle _x in list trgBase_side1) && ((side group _x) != (trgBase_side1 getVariable "TVD_BaseSide")) ) 
+				) then {
+				
+					null = [_x, objNull] call TVD_SendToResMan;
+				
+				};
+			};
+		};
+	} forEach PlayableUnits;
+};
+
+
 _statsUpdated = [_endOpt,0,0] call TVD_ScoreKeeper;
 
 _InitScore = TVD_InitScore;

@@ -49,11 +49,14 @@ TVD_sidesZonesScore = [0,0];
 TVD_sidesResScore = [0,0];
 
 timeToEnd = -1;
+TVD_TimeExtendPossible = false;
 TVD_HeavyLosses = sideLogic;
 TVD_MissionComplete = sideLogic;
 TVD_SideCanRetreat = [false, false, false];		//When the retreat conditions are met
 TVD_SideRetreat = sideLogic;
+TVD_GroupList = [];
 TVD_MissionLog = [];
+TVD_PlayableUnits = [];
 
 
 colorToSide = compile preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
@@ -67,11 +70,12 @@ TVD_util_MissionLogWriter = compile preprocessFileLineNumbers "TVD\TVD_util_Miss
 TVD_util_DebriefWriter = compile preprocessFileLineNumbers "TVD\TVD_util_debriefWriter.sqf";
 
 TVD_CaptureVehicle = compile preprocessFileLineNumbers "TVD\TVD_CaptureVehicle.sqf";
+TVD_EndMissionHandler = compile preprocessFileLineNumbers "TVD\TVD_EndMissionHandler.sqf";
 TVD_EndMissionPreps = compile preprocessFileLineNumbers "TVD\TVD_EndMissionPreps.sqf";
 TVD_HeavyLossesOverride = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesOverride.sqf";
-TVD_HeavyLossesHandler = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesHandler.sqf";
+// TVD_HeavyLossesHandler = compile preprocessFileLineNumbers "TVD\TVD_HeavyLossesHandler.sqf";
 TVD_HQTransfer = compile preprocessFileLineNumbers "TVD\TVD_HQTransfer.sqf";
-TVD_MissionCompleteHandler = compile preprocessFileLineNumbers "TVD\TVD_MissionCompleteHandler.sqf";
+// TVD_MissionCompleteHandler = compile preprocessFileLineNumbers "TVD\TVD_MissionCompleteHandler.sqf";
 // TVD_PreEndMission = compile preprocessFileLineNumbers "TVD\TVD_PreEndMission.sqf";
 TVD_Retreat = compile preprocessFileLineNumbers "TVD\TVD_Retreat.sqf";
 TVD_RetreatSoldier = compile preprocessFileLineNumbers "TVD\TVD_RetreatSoldier.sqf";
@@ -91,10 +95,65 @@ publicVariable "TVD_sides";
 publicVariable "TVD_RetreatPossible";
 publicVariable "TVD_SideCanRetreat";
 
+{	
+	if ( (side _x in TVD_sides) ) then {
+		private ["_tv1","_tv2","_grId"];
+		_tv1 = (str group _x) splitString " ";
+
+		_tv2 = switch (_tv1 select 1) do {
+			case "Alpha":		{"A"};
+			case "Bravo":		{"B"};
+			case "Charlie":		{"C"};
+			case "Delta":		{"D"};
+			default 		{""}
+		};
+
+		_grId = _tv2 + (_tv1 select 2) + ":" + str ((units group _x find _x) + 1);
+		_x setVariable ["TVD_GroupID", _grId, true];
+
+		
+		// if (!isNil { _x getVariable "TVD_Group" }) then {
+			// {
+				// _x setVariable ["TVD_Group", str group _x, true];
+			// } forEach units group _x;
+			// TVD_GroupList pushBack (str group _x);
+		// };
+		
+		
+	};
+} forEach playableUnits;
+
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 waitUntil {sleep 5; WMT_pub_frzState >= 3}; //==3 when freeze over, ==1 when freeze up
+
+
+{
+	if ((count units _x > 0) && (side _x in TVD_sides)) then {
+		_z = TVD_GroupList pushBack [str _x, side _x, (units _x)];
+		{
+			_x setVariable ["TVD_Group", _z, true];
+			if (_x == leader group _x) then {
+				_x setVariable ["TVD_GroupLeader", true, true];
+			};
+		} forEach units _x;
+	};
+} forEach AllGroups;
+
+
+//Список игроков по сторонам и отделениям в лог
+{
+	TVD_PlayableUnits pushBack (str _x);
+} forEach playableUnits;
+diag_log	parseText format ["//------------------------------------------------------------//"];
+diag_log	parseText format ["TVD_PlayableUnits:"];
+{
+	diag_log	parseText format ["%1", _x];
+} forEach TVD_PlayableUnits;
+diag_log	parseText format ["//------------------------------------------------------------//"];
+
+
 
 //--- Настройка: количество зон
 if (TVD_capZonesCount != 0) then {
@@ -173,6 +232,32 @@ if (TVD_capZonesCount != 0) then {
 //-------------Посчет живой силы воюющих сторон
 {	
 	if ( (side _x in TVD_sides) ) then {
+		
+		_x addMPEventHandler ["mpkilled", {		if (isServer) then {
+				private ["_victim","_initGroupCount","_vicGroup","_vgLeaderAlive"];
+				
+				_victim = _this select 0;
+				_vicGroup = ((TVD_GroupList select (_victim getVariable "TVD_Group")) select 2);
+				_vgLeaderAlive = false;
+				{
+					if ( (_x getVariable ["TVD_GroupLeader", false]) && (alive _x) ) then {_vgLeaderAlive = true};
+				} forEach _vicGroup;
+				// {
+					// if ( ((_x getVariable "TVD_UnitValue" select 2) in ["sideLeader","execSideLeader","squadLeader"]) && (alive _x) ) then {_vgLeaderAlive = true};
+				// } forEach _vicGroup;
+				
+	
+				if ( ( ({alive _x} count _vicGroup) < ((count _vicGroup) / 2)) && !(_vgLeaderAlive) && !(_victim getVariable ["TVD_GroupDestroyed", false]) ) then {
+					{
+						_x setVariable ["TVD_GroupDestroyed", true, true];
+					} forEach _vicGroup;
+					["grpDestroyed", TVD_GroupList select (_victim getVariable "TVD_Group")] call TVD_util_MissionLogWriter;
+				};
+				
+			}}];
+		
+		
+		
 		if (!isNil {_x getVariable "TVD_UnitValue"}) then {
 			_unitSide = TVD_sides find ( _x getVariable "TVD_UnitValue" select 0 );
 			
@@ -185,7 +270,7 @@ if (TVD_capZonesCount != 0) then {
 				};
 			} else {												//Если картодел сам не назначил роль - роль по умолчанию ком.отделения.
 				_x getVariable "TVD_UnitValue" pushBack "squadLeader"; 						//Добавляем элемент в массив
-				_x setVariable ["TVD_UnitValue", _x getVariable "TVD_UnitValue", true];		//Броандкастим обновленное значение
+				_x setVariable ["TVD_UnitValue", _x getVariable "TVD_UnitValue", true];		//Броадкастим обновленное значение
 			};		//Убрать когда напишу util_autoEvaluate
 			
 															//Вызывает логРайтер, который в конце вызовет скорКипер, который удалит TVD_UnitValue убитого юнита
@@ -195,8 +280,8 @@ if (TVD_capZonesCount != 0) then {
 			_unitSide = TVD_sides find (side _x);
 			TVD_InitScore set [_unitSide, (TVD_InitScore select _unitSide) + TVD_SoldierCost];
 		};
+
 		
-		_x setVariable ['AGM_isCaptive', false, true];
 	};
 } forEach AllUnits;
 

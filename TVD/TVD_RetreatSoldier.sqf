@@ -31,6 +31,7 @@ _passData pushBack (side group _restreatingUnit);//(_restreatingUnit getVariable
 _passData pushBack (if (isnil {_restreatingUnit getVariable "TVD_UnitValue" select 2}) then {""} else {
 	((_restreatingUnit getVariable "TVD_UnitValue" select 2) call TVD_unitRole);
 });
+_passData pushBack (_restreatingUnit getVariable "TVD_GroupID");
 
 if (!isNil {_restreatingUnit getVariable "TVD_UnitValue"}) then {
 	_amount = _restreatingUnit getVariable "TVD_UnitValue" select 1;
@@ -62,4 +63,3 @@ null = ["retreatSoldier", _passData] call TVD_util_MissionLogWriter;
 
 
 _passData
-

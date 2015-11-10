@@ -11,7 +11,7 @@ _unit = _this select 1;
 
 switch (_this select 0) do {
 	case "slTransfer" : {
-		_unitValue = (_unit getVariable ["TVD_UnitValue", sideLogic]) select 0;
+		_unitValue = (_unit getVariable ["TVD_UnitValue", [sideLogic,0]]) select 0;
 		_eslFound = false;
 		scopeName "depth1";
 		

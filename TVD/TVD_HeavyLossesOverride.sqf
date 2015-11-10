@@ -12,7 +12,7 @@ if (isNil "TVD_hl_sidelimits") then {
 };
 
 if (isNil "TVD_hl_ratio") then {
-	TVD_hl_ratio = [0.1,0.1,0.1];
+	TVD_hl_ratio = [0.2,0.2,0.2];
 };
 
 waitUntil {sleep 5; (!isNil{wmt_playerCountInit}) && (!isNil{wmt_PlayerCountNow})};

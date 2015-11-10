@@ -66,18 +66,21 @@ while {alive player} do {
 				};
 				
 				
-			}, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false])"];
+			}, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['ACE_isUnconscious', false]) && !(_this getVariable ['ace_captives_ishandcuffed', false])"];
+			// }, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false])"];		//Перевод на ACE
 			
 			
 			srActIDCancel = (_this select 1) addAction ["<t color='#8BC8D6'>САМОСТОЯТЕЛЬНО ОТСТУПИТЬ: Отмена</t>", {
 				srAct = 1;
 				(_this select 1) removeAction srActIDapprove;
 				(_this select 1) removeAction srActIDCancel;
-			}, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false])"];
+			}, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['ACE_isUnconscious', false]) && !(_this getVariable ['ace_captives_ishandcuffed', false])"];
+			// }, nil, 0, false, true, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false])"];		//Перевод на ACE
 		
 		
 		
-		}, nil, 0, false, false, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false]) && (srAct == 1)"];
+		}, nil, 0, false, false, "", "(_this == _target) && !(_this getVariable ['ACE_isUnconscious', false]) && !(_this getVariable ['ace_captives_ishandcuffed', false]) && (srAct == 1)"];
+		// }, nil, 0, false, false, "", "(_this == _target) && !(_this getVariable ['AGM_isUnconscious', false]) && !(_this getVariable ['AGM_isCaptive', false]) && (srAct == 1)"]; 	//Перевод на ACE
 	};
 	
 	

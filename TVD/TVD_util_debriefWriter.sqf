@@ -35,7 +35,7 @@ switch (_outcome) do {
 
 //Список зон для основного блока под "Контроллируемые зоны":
 {
-	_zonesList pushBack parseText format ["<t align='right' size='0.7' shadow='2' color='%1'>%2</t>", _sColor select ([east, west, resistance, civilian] find (_x select 1) ), markerText (_x select 0) ];
+	_zonesList pushBack parseText format ["<t align='right' size='0.7' shadow='2' color='%1'>%2</t>", _sColor select ([east, west, resistance, civilian, sideLogic] find (_x select 1) ), markerText (_x select 0) ];
 } forEach TVD_capZones;
 zonesList = _zonesList;
 

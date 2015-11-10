@@ -8,8 +8,11 @@ switch (_this) do
 		case "sideLeader":		{"КС"};
 		case "execSideLeader":	{"исп.КС"};
 		case "squadLeader":		{"КО"};
+		case "crewTank":		{"Экипаж(Т)"};
+		case "crewAPC":			{"Экипаж(БТР)"};
+		case "pilot":			{"Пилот"};
 		case "sniper":			{"Снайпер"};
-		case "vip":				{"VIP"};
+		case "vip":				{"Спец-юнит"};
 		case "soldier":			{""};
 		default 		{""}
 	};

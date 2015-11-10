@@ -25,10 +25,11 @@ TVD_Ext_addFriskAction = {
 
 		}, 
 		[], -1, false, true, "", 
-		"(_this != _target) && ((_this distance _target) <= 3) && ( (_target getVariable 'AGM_isCaptive') || (_target getVariable ['AGM_isUnconscious', false]) )"
+		"(_this != _target) && ((_this distance _target) <= 3) && ( (_target getVariable ['ace_captives_ishandcuffed', false]) || (_target getVariable ['ACE_isUnconscious', false]) )"
 	];
 	
-	waitUntil {sleep 1; (( !(_targetUnit getVariable ["AGM_isCaptive",false]) && !(_targetUnit getVariable ["AGM_isUnconscious", false]) ) || !(alive _targetUnit)) };
+	waitUntil {sleep 1; (( !(_targetUnit getVariable ['ace_captives_ishandcuffed', false]) && !(_targetUnit getVariable ["ACE_isUnconscious", false]) ) || !(alive _targetUnit)) };
+	// waitUntil {sleep 1; (( !(_targetUnit getVariable ["AGM_isCaptive",false]) && !(_targetUnit getVariable ["AGM_isUnconscious", false]) ) || !(alive _targetUnit)) };
 	
 	_targetUnit removeAction _friskAction;
 	
@@ -47,7 +48,7 @@ if (isServer) then {
 
 	while {true} do {
 		{
-			if ( ((_x getVariable ["AGM_isCaptive",false]) || (_x getVariable ["AGM_isUnconscious", false])) && !(_x getVariable ["TVD_friskActionSent", false]) ) then {
+			if ( ((_x getVariable ['ace_captives_ishandcuffed', false]) || (_x getVariable ["ACE_isUnconscious", false])) && !(_x getVariable ["TVD_friskActionSent", false]) ) then {
 				_x setVariable ["TVD_friskActionSent", true];
 				TVD_Captured = _x;
 				publicVariable "TVD_Captured";
