@@ -34,8 +34,9 @@ null = [ [west, independent] ] spawn compileFinal preprocessFileLineNumbers "TVD
 private ["_missionResults","_TVD_sides","_TVD_capZonesCount","_TVD_RetreatPossible","_TVD_ZoneGain","_TVD_RetreatRatio","_checkTasks","_endCause","_counter"];
 
 //Убрать ВМТ лимиты (-1 все) и выставить ТВД аналоги
-wmt_hl_sidelimits = [-1,-1,-1];		//[east, west, resistance]
-wmt_hl_ratio = [-1,-1,-1];
+// wmt_hl_sidelimits = [-1,-1,-1];		//[east, west, resistance]
+// wmt_hl_ratio = [-1,-1,-1];
+wmt_hl_disable = true;
 
 
 
@@ -84,6 +85,8 @@ if (isServer) then {
 	
 	[] spawn {		//Раз в 5мин пишем в лог состояние миссии (на случай непредвиденного завершения, чтобы оценить результаты миссии)
 		private ["_mTime","_mWaitTime"];
+		
+		waitUntil {sleep 5; (!isNil{TVD_playerCountInit}) && (!isNil{TVD_PlayerCountNow})};
 		
 		while {true} do {				
 			

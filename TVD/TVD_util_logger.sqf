@@ -27,7 +27,7 @@ _si1 = [east, west, resistance, civilian, sideLogic] find (TVD_sides select 1);
 		diag_log	parseText format ["Mission date/time: %1", date];
 		diag_log	parseText format ["missionStart: %1", missionStart];
 		diag_log	parseText format ["winSide: %1;   Supremacy: %2;   Supremacy Ratio: %3 - %4   Current Score: %5", _missionResults select 0, _missionResults select 1, _missionResults select 2, _missionResults select 3, _missionResults select 4];
-		diag_log	parseText format ["Soldiers Dead: %1 - %2;   Soldiers Present: %3 - %4", (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0) - (TVD_RetrCount select 0), (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1) - (TVD_RetrCount select 1), wmt_PlayerCountNow select _si0, wmt_PlayerCountNow select _si1];
+		diag_log	parseText format ["Soldiers Dead: %1 - %2;   Soldiers Present: %3 - %4", (TVD_playerCountInit select _si0) - (TVD_PlayerCountNow select _si0) - (TVD_RetrCount select 0), (TVD_playerCountInit select _si1) - (TVD_PlayerCountNow select _si1) - (TVD_RetrCount select 1), TVD_PlayerCountNow select _si0, TVD_PlayerCountNow select _si1];
 		diag_log	parseText format ["EndMission Reason: %1", _outcome];
 		diag_log	parseText format ["Vars:"];
 		diag_log	parseText format ["TVD_sides = %1", TVD_sides];

@@ -29,9 +29,9 @@ switch (_type) do {
 		
 			// parseText "<t size='0.7' shadow='2'>Статус. </t>",
 			//Живые
-			parseText format ["<t size='0.7' shadow='2'>Живых: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, wmt_PlayerCountNow select _si0, _sColor select _si1, wmt_PlayerCountNow select _si1],
+			parseText format ["<t size='0.7' shadow='2'>Живых: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, TVD_PlayerCountNow select _si0, _sColor select _si1, TVD_PlayerCountNow select _si1],
 			//Мертвые
-			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, (wmt_playerCountInit select _si0) - (wmt_PlayerCountNow select _si0),_sColor select _si1, (wmt_playerCountInit select _si1) - (wmt_PlayerCountNow select _si1)],
+			parseText format ["<t size='0.7' shadow='2'>Потери: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, (TVD_playerCountInit select _si0) - (TVD_PlayerCountNow select _si0),_sColor select _si1, (TVD_playerCountInit select _si1) - (TVD_PlayerCountNow select _si1)],
 			//Зоны
 			parseText format ["<t size='0.7' shadow='2'>Зоны: <t color='%1'>%2</t>-<t color='%3'>%4</t>. </t>",_sColor select _si0, {_x select 1 == TVD_sides select 0} count TVD_capZones,_sColor select _si1, {_x select 1 == TVD_sides select 1} count TVD_capZones],
 			//Задачи
