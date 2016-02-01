@@ -129,6 +129,7 @@ if (isServer) then {
 				_endCause = 0;
 				
 				timeToEnd = _endCause;
+				publicVariable "timeToEnd";
 				
 				waitUntil {
 					sleep 1;
@@ -146,6 +147,7 @@ if (isServer) then {
 			case (WMT_Global_LeftTime select 0  < 300): {
 				_endCause = 1;
 				timeToEnd = _endCause;
+				publicVariable "timeToEnd";
 				
 				waitUntil {
 					sleep 1;
@@ -166,6 +168,7 @@ if (isServer) then {
 				_endCause = 2;
 				em_result = false;
 				timeToEnd = _endCause;
+				publicVariable "timeToEnd";
 				
 				[_endCause] spawn {
 					waitUntil {
@@ -191,6 +194,7 @@ if (isServer) then {
 				// sr_result = false;
 				em_result = false;
 				timeToEnd = _endCause;
+				publicVariable "timeToEnd";
 				
 				[_endCause] spawn {
 					waitUntil {
@@ -221,6 +225,7 @@ if (isServer) then {
 				_endCause = 4;
 				em_result = false;
 				timeToEnd = _endCause;
+				publicVariable "timeToEnd";
 				
 				[_endCause] spawn {
 					waitUntil {

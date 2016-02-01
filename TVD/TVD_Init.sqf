@@ -94,6 +94,7 @@ waitUntil {sleep 3; time > 0};
 publicVariable "TVD_sides";
 publicVariable "TVD_RetreatPossible";
 publicVariable "TVD_SideCanRetreat";
+publicVariable "timeToEnd";
 
 {	
 	if ( (side _x in TVD_sides) ) then {
@@ -234,7 +235,7 @@ if (TVD_capZonesCount != 0) then {
 	if ( (side _x in TVD_sides) ) then {
 		
 		_x addMPEventHandler ["mpkilled", {		if (isServer) then {
-				private ["_victim","_initGroupCount","_vicGroup","_vgLeaderAlive"];
+				private ["_victim","_initGroupCount","_vicGroup","_vgLeaderAlive","_grpName","_sc0"];
 				
 				_victim = _this select 0;
 				_vicGroup = ((TVD_GroupList select (_victim getVariable "TVD_Group")) select 2);
@@ -246,13 +247,31 @@ if (TVD_capZonesCount != 0) then {
 					// if ( ((_x getVariable "TVD_UnitValue" select 2) in ["sideLeader","execSideLeader","squadLeader"]) && (alive _x) ) then {_vgLeaderAlive = true};
 				// } forEach _vicGroup;
 				
-	
-				if ( ( ({alive _x} count _vicGroup) < ((count _vicGroup) / 2)) && !(_vgLeaderAlive) && !(_victim getVariable ["TVD_GroupDestroyed", false]) ) then {
-					{
-						_x setVariable ["TVD_GroupDestroyed", true, true];
-					} forEach _vicGroup;
-					["grpDestroyed", TVD_GroupList select (_victim getVariable "TVD_Group")] call TVD_util_MissionLogWriter;
+				_grpName = (TVD_GroupList select (_victim getVariable "TVD_Group")) select 0;
+				_sc0 = [east, west, resistance, civilian, sideLogic] find ((TVD_GroupList select (_victim getVariable "TVD_Group")) select 1);
+
+
+				[_victim, _vicGroup, _vgLeaderAlive,_grpName,_sc0] spawn {
+					private ["_victim","_vicGroup","_vgLeaderAlive","_logText","_grpName","_sc0","_sColor"];
+					_victim = _this select 0;
+					_vicGroup = _this select 1;
+					_vgLeaderAlive = _this select 2;
+					_grpName = _this select 3;
+					_sc0 = _this select 4;
+					
+					sleep 10;
+					if ( ( ({alive _x} count _vicGroup) < ((count _vicGroup) / 2)) && !(_vgLeaderAlive) && !(_victim getVariable ["TVD_GroupDestroyed", false]) ) then {
+						{
+							_x setVariable ["TVD_GroupDestroyed", true, true];
+						} forEach _vicGroup;
+						
+						_sColor = ["#ed4545","#457aed","#27b413","#d16be5","#ffffff"];
+						_logText = composeText [parseText format ["<t size='0.7' shadow='2'>Группа <t color='%1'>%2</t> была уничтожена.</t>", _sColor select _sc0, _grpName] ];
+						["grpDestroyed", _logText] call TVD_util_MissionLogWriter;
+						// ["grpDestroyed", TVD_GroupList select (_victim getVariable "TVD_Group")] call TVD_util_MissionLogWriter;
+					};
 				};
+				
 				
 			}}];
 		

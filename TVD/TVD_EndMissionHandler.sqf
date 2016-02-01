@@ -73,7 +73,7 @@ if (TVD_TimeExtendPossible) then {
 			
 			if !(isDedicated) then {	
 			
-				hint format ["%1\n\nМиссия завершится через:\n\n%2\n\n(КС может продлить (%3))", _this select 1, [_waitTime,"MM:SS"] call BIS_fnc_secondsToString, em_bonus];	
+				hint format ["%1\n\nМиссия завершится через:\n\n%2\n\n(КС может продлить (%3 раз(а)))", _this select 1, [_waitTime,"MM:SS"] call BIS_fnc_secondsToString, em_bonus];	
 				
 				if (em_extended) then {
 					em_extended = false;

@@ -60,13 +60,13 @@ if (_retrOn != -1) then {
 _ratioDiff = (_scoreRatio select 0) - (_scoreRatio select 1);
 if (_ratioDiff > 0) then {_winSide = TVD_sides select 0} else {_winSide = TVD_sides select 1};
 switch (true) do {
-	case (abs(_ratioDiff) > 22) : {		//Сокрушительная победа
+	case (abs(_ratioDiff) > 36) : {		//Сокрушительная победа
 		_superiority = 3;
 	};
 	case (abs(_ratioDiff) > 12) : {		//Уверенная победа
 		_superiority = 2;
 	};
-	case (abs(_ratioDiff) > 6) : {		//Преимущественная победа
+	case (abs(_ratioDiff) > 4) : {		//Преимущественная победа
 		_superiority = 1;
 	};
 	DEFAULT {		//Ничья

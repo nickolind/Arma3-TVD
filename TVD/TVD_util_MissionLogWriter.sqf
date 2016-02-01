@@ -115,17 +115,19 @@ switch (_type) do {
 	
 	
 	case "grpDestroyed": {
-		_unit = _this select 1;
-		_unitName = _unit select 0;
-		_si0 = [east, west, resistance, civilian, sideLogic] find (_unit select 1);
-
-		_plot = composeText [_plot, parseText format ["<t size='0.7' shadow='2'>Группа <t color='%1'>%2</t> была уничтожена.</t>", _sColor select _si0, _unitName] ];
+		_varUni = _this select 1;
+		_plot = _varUni;
 	};
 	
 	
 	case "killed": {
 		_unit = _this select 1;
-		if (!(((_unit getVariable ["TVD_UnitValue", [sideLogic,0]]) select 0) in TVD_Sides) || (_unit getVariable ["TVD_soldierRetreats", false]) || (_unit getVariable ["TVD_soldierSentToRes", false]) ) exitWith {_lCancel = true;};
+		if ( !( ((_unit getVariable ["TVD_UnitValue", [sideLogic,0]]) select 0) in TVD_Sides) 
+			|| 
+			(_unit getVariable ["TVD_soldierRetreats", false]) 
+			|| 
+			(_unit getVariable ["TVD_soldierSentToRes", false]) 
+		) exitWith {_lCancel = true;};
 		
 		if (!isNil{_unit getVariable "TVD_UnitValue" select 2}) then {
 			if (_unit getVariable "TVD_UnitValue" select 2 in ["soldier"]) exitWith {
