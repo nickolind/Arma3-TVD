@@ -59,7 +59,8 @@ if (TVD_TimeExtendPossible) then {
 };
 
 [[ [_showTo, _message], {
-	if ( (isServer) || (side group player in (_this select 0)) || !(alive player) ) then {
+	if ( isNil{TVD_Curator} ) then {TVD_Curator = objNull};
+	if ( (isServer) || (side group player in (_this select 0)) || !(alive player) || (player == TVD_Curator) ) then {
 		private ["_time","_waitTime"];
 		
 		[format ["%1<br/><br/>Миссия завершится через %2", _this select 1, [em_ttw,"MM:SS"] call BIS_fnc_secondsToString],0,0,5,0.2] call bis_fnc_dynamictext;

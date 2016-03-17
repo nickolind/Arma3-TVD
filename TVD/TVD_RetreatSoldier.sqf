@@ -15,7 +15,8 @@ _passData = [];
 
 //Сообщение ближайшим игрокам
 {
-	if ((isPlayer _x) && (side group _x == side group _restreatingUnit)) then { 
+	if ( isNil{TVD_Curator} ) then {TVD_Curator = objNull};
+	if ( ((isPlayer _x) && (side group _x == side group _restreatingUnit)) || (player == TVD_Curator)) then { 
 		[[ [name _restreatingUnit], { 
 			titleText [format ["%1 самостоятельно отступил в тыл.",_this select 0], "PLAIN DOWN"];
 		}],"BIS_fnc_call", _x] call BIS_fnc_MP;

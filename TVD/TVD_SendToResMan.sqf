@@ -23,7 +23,7 @@ _passData = [];
 			titleText [format ["Пленник (%1) отправлен в тыл стороны %2.",_this select 0, _this select 1], "PLAIN DOWN"];
 		}],"BIS_fnc_call", _x] call BIS_fnc_MP;
 	};
-} forEach (_cu_target nearEntities 50);
+} forEach (_cu_target nearEntities 50) + [TVD_Curator];
 
 
 _passData pushBack (name _cu_target);

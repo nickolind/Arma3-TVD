@@ -57,6 +57,7 @@ TVD_SideRetreat = sideLogic;
 TVD_GroupList = [];
 TVD_MissionLog = [];
 TVD_PlayableUnits = [];
+TVD_StaticWeapons = [];
 
 
 colorToSide = compile preprocessFileLineNumbers "TVD\TVD_util_ColorToSide.sqf";
@@ -86,6 +87,13 @@ TVD_TaskCompleted = compile preprocessFileLineNumbers "TVD\TVD_TaskCompleted.sqf
 TVD_TasksKeeper = compile preprocessFileLineNumbers "TVD\TVD_TasksKeeper.sqf";
 TVD_WinCalculations = compile preprocessFileLineNumbers "TVD\TVD_WinCalculations.sqf";
 
+
+
+{
+	if ( (_x isKindOf "StaticWeapon") ) then {
+		TVD_StaticWeapons pushBack _x;
+	};
+} forEach vehicles;
 
 
 
@@ -153,6 +161,17 @@ diag_log	parseText format ["TVD_PlayableUnits:"];
 	diag_log	parseText format ["%1", _x];
 } forEach TVD_PlayableUnits;
 diag_log	parseText format ["//------------------------------------------------------------//"];
+
+if ( !isNil{TVD_Curator} ) then {  
+	(owner TVD_Curator) publicVariableClient "TVD_PlayableUnits";
+	
+	[[ [], { 
+		diag_log parseText format ["TVD_PlayableUnits:"];
+		{
+			diag_log parseText format ["%1", str _x];
+		} forEach TVD_PlayableUnits;
+	}],"BIS_fnc_call", TVD_Curator] call BIS_fnc_MP;
+};
 
 
 
@@ -307,7 +326,7 @@ if (TVD_capZonesCount != 0) then {
 
 //------------Подсчет техники воющих сторон
 {
-	if (!isNil {_x getVariable "TVD_UnitValue"}) then {
+	if ( (!isNil {_x getVariable "TVD_UnitValue"}) ) then {
 		_unitSide = TVD_sides find ( _x getVariable "TVD_UnitValue" select 0 );
 		if (_unitSide == -1) then {_unitSide = 2};
 		
@@ -325,7 +344,7 @@ if (TVD_capZonesCount != 0) then {
 		
 		_x addMPEventHandler ["mpkilled", {	if ( (isServer) && (((_this select 0) getVariable "TVD_UnitValue" select 1 ) > 1) ) then {["killed", _this select 0] call TVD_util_MissionLogWriter}	}];		//Не срабатывать на технику с ценностью <= 10 (транспортные машины, обычно)
 	};
-} forEach vehicles;
+} forEach (vehicles + TVD_StaticWeapons);
 
 
 publicVariable "TVD_ValUnits";
